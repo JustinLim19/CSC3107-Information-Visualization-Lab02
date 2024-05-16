@@ -1,0 +1,118 @@
+---
+title: "Team Lab Assignment 2: Presenting ASEAN Meat Production as a Table"
+author: "Abdul Halim Bin Abdul Rahim, Ryan Ong, Mirza Anaqi, Gabriel Lau, Elroy Lian, Frederick Ang"
+date: "2024-05-17"
+format: html
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r setup, include=FALSE}
+# Load necessary packages
+if (!requireNamespace("dplyr", quietly = TRUE)) install.packages("dplyr")
+if (!requireNamespace("tidyr", quietly = TRUE)) install.packages("tidyr")
+if (!requireNamespace("gt", quietly = TRUE)) install.packages("gt")
+if (!requireNamespace("styler", quietly = TRUE)) install.packages("styler")
+if (!requireNamespace("lintr", quietly = TRUE)) install.packages("lintr")
+library(dplyr)
+library(tidyr)
+library(gt)
+library(styler)
+library(lintr)
+```
+
+You can add options to executable code like this 
+
+```{r}
+# Load raw data
+raw_data <- read.csv("asean_meat_production.csv")
+
+# Inspect the first few rows of the data to ensure column names are correct
+head(raw_data)
+
+# Inspect unique values in the 'meat' column
+unique(raw_data$meat)
+```
+
+```{r}
+# Standardize meat type names if necessary
+raw_data <- raw_data %>%
+  mutate(meat = case_when(
+    meat == "Beef and Buffalo Meat" ~ "Beef and Buffalo Meat",
+    meat == "Pig meat" ~ "Pig Meat", # Standardizing to "Pig Meat"
+    meat == "Mutton and Goat Meat" ~ "Mutton and Goat Meat",
+    meat == "Poultry meat" ~ "Poultry Meat", # Standardizing to "Poultry Meat"
+    TRUE ~ meat # Keep other values unchanged
+  ))
+```
+
+```{r}
+# Data cleaning and manipulation
+data_wide <- raw_data %>%
+  pivot_wider(names_from = meat, values_from = kt) %>%
+  group_by(country, year) %>%
+  mutate(
+    Total_meat_production = rowSums(
+      across(
+        c(`Beef and Buffalo Meat`, `Pig Meat`, `Mutton and Goat Meat`, `Poultry Meat`),
+        ~ replace_na(.x, 0)
+      )
+    )
+  ) %>%
+  ungroup()
+```
+
+```{r}
+# Filter the data for the year 2021
+data_2021 <- data_wide %>%
+  filter(year == 2021)
+
+# Create the table
+table_gt <- data_2021 %>%
+  gt() %>%
+  tab_header(
+    title = "Table 10.14. Livestock and Poultry Meat Production in ASEAN, 2018-2021",
+    subtitle = "(in thousand metric tons)"
+  ) %>%
+  tab_spanner(
+    label = "Livestock production",
+    columns = c(`Beef and Buffalo Meat`, `Pig Meat`, `Mutton and Goat Meat`)
+  ) %>%
+  tab_spanner(
+    label = "Poultry production",
+    columns = c(`Poultry Meat`)
+  ) %>%
+  cols_label(
+    `Beef and Buffalo Meat` = "Beef and Buffalo Meat",
+    `Pig Meat` = "Pig Meat",
+    `Mutton and Goat Meat` = "Mutton and Goat Meat",
+    `Poultry Meat` = "Poultry Meat",
+    Total_meat_production = "Total meat production"
+  ) %>%
+  fmt_number(
+    columns = c(`Beef and Buffalo Meat`, `Pig Meat`, `Mutton and Goat Meat`, `Poultry Meat`, Total_meat_production),
+    decimals = 1
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = everything()
+  )
+
+# Print the table
+table_gt
+```
+
+```{r}
+# Apply styling to your R script
+style_file("Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd")
+
+# Lint your script to find potential issues
+lint("Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd")
+```
+The `echo: false` option disables the printing of code (only output is displayed).
