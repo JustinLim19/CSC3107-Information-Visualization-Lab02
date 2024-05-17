@@ -140,89 +140,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 [4] "Poultry meat"         </code></pre>
 </div>
 </div>
+</section>
+<section id="pivot-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="pivot-the-data">2.1 <strong>Pivot the Data</strong></h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize meat type names if necessary</span></span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pivot the data to have one column per country</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>raw_data <span class="ot">&lt;-</span> raw_data <span class="sc">%&gt;%</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">meat =</span> <span class="fu">case_when</span>(</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    meat <span class="sc">==</span> <span class="st">"Beef and Buffalo Meat"</span> <span class="sc">~</span> <span class="st">"Beef and Buffalo Meat"</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    meat <span class="sc">==</span> <span class="st">"Pig meat"</span> <span class="sc">~</span> <span class="st">"Pig Meat"</span>, <span class="co"># Standardizing to "Pig Meat"</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    meat <span class="sc">==</span> <span class="st">"Mutton and Goat Meat"</span> <span class="sc">~</span> <span class="st">"Mutton and Goat Meat"</span>,</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    meat <span class="sc">==</span> <span class="st">"Poultry meat"</span> <span class="sc">~</span> <span class="st">"Poultry Meat"</span>, <span class="co"># Standardizing to "Poultry Meat"</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> meat <span class="co"># Keep other values unchanged</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data cleaning and manipulation</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>data_wide <span class="ot">&lt;-</span> raw_data <span class="sc">%&gt;%</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> meat, <span class="at">values_from =</span> kt) <span class="sc">%&gt;%</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country, year) <span class="sc">%&gt;%</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Total_meat_production =</span> <span class="fu">rowSums</span>(</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">across</span>(</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">`</span><span class="at">Beef and Buffalo Meat</span><span class="st">`</span>, <span class="st">`</span><span class="at">Pig Meat</span><span class="st">`</span>, <span class="st">`</span><span class="at">Mutton and Goat Meat</span><span class="st">`</span>, <span class="st">`</span><span class="at">Poultry Meat</span><span class="st">`</span>),</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> <span class="fu">replace_na</span>(.x, <span class="dv">0</span>)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter the data for the year 2021</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>data_2021 <span class="ot">&lt;-</span> data_wide <span class="sc">%&gt;%</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2021</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the table</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>table_gt <span class="ot">&lt;-</span> data_2021 <span class="sc">%&gt;%</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Table 10.14. Livestock and Poultry Meat Production in ASEAN, 2018-2021"</span>,</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"(in thousand metric tons)"</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_spanner</span>(</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">"Livestock production"</span>,</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">Beef and Buffalo Meat</span><span class="st">`</span>, <span class="st">`</span><span class="at">Pig Meat</span><span class="st">`</span>, <span class="st">`</span><span class="at">Mutton and Goat Meat</span><span class="st">`</span>)</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_spanner</span>(</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">"Poultry production"</span>,</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">Poultry Meat</span><span class="st">`</span>)</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Beef and Buffalo Meat</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Beef and Buffalo Meat"</span>,</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Pig Meat</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Pig Meat"</span>,</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Mutton and Goat Meat</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Mutton and Goat Meat"</span>,</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Poultry Meat</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Poultry Meat"</span>,</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">Total_meat_production =</span> <span class="st">"Total meat production"</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(</span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">Beef and Buffalo Meat</span><span class="st">`</span>, <span class="st">`</span><span class="at">Pig Meat</span><span class="st">`</span>, <span class="st">`</span><span class="at">Mutton and Goat Meat</span><span class="st">`</span>, <span class="st">`</span><span class="at">Poultry Meat</span><span class="st">`</span>, Total_meat_production),</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">1</span></span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_align</span>(</span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"center"</span>,</span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>()</span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the table</span></span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>table_gt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> country, <span class="at">values_from =</span> kt)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Preview the data</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">gt_preview</span>(raw_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<div id="fcelvsiovs" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#fcelvsiovs table {
+<div id="sliajbqrof" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#sliajbqrof table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#fcelvsiovs thead, #fcelvsiovs tbody, #fcelvsiovs tfoot, #fcelvsiovs tr, #fcelvsiovs td, #fcelvsiovs th {
+#sliajbqrof thead, #sliajbqrof tbody, #sliajbqrof tfoot, #sliajbqrof tr, #sliajbqrof td, #sliajbqrof th {
   border-style: none;
 }
 
-#fcelvsiovs p {
+#sliajbqrof p {
   margin: 0;
   padding: 0;
 }
 
-#fcelvsiovs .gt_table {
+#sliajbqrof .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -248,12 +194,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#fcelvsiovs .gt_caption {
+#sliajbqrof .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#fcelvsiovs .gt_title {
+#sliajbqrof .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -265,7 +211,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#fcelvsiovs .gt_subtitle {
+#sliajbqrof .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -277,7 +223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#fcelvsiovs .gt_heading {
+#sliajbqrof .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -289,13 +235,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#fcelvsiovs .gt_bottom_border {
+#sliajbqrof .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#fcelvsiovs .gt_col_headings {
+#sliajbqrof .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -310,7 +256,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#fcelvsiovs .gt_col_heading {
+#sliajbqrof .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -330,7 +276,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#fcelvsiovs .gt_column_spanner_outer {
+#sliajbqrof .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -342,15 +288,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#fcelvsiovs .gt_column_spanner_outer:first-child {
+#sliajbqrof .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#fcelvsiovs .gt_column_spanner_outer:last-child {
+#sliajbqrof .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#fcelvsiovs .gt_column_spanner {
+#sliajbqrof .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -362,11 +308,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#fcelvsiovs .gt_spanner_row {
+#sliajbqrof .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#fcelvsiovs .gt_group_heading {
+#sliajbqrof .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -392,7 +338,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#fcelvsiovs .gt_empty_group_heading {
+#sliajbqrof .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -407,15 +353,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#fcelvsiovs .gt_from_md > :first-child {
+#sliajbqrof .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#fcelvsiovs .gt_from_md > :last-child {
+#sliajbqrof .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#fcelvsiovs .gt_row {
+#sliajbqrof .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -434,7 +380,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#fcelvsiovs .gt_stub {
+#sliajbqrof .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -447,7 +393,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#fcelvsiovs .gt_stub_row_group {
+#sliajbqrof .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -461,15 +407,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#fcelvsiovs .gt_row_group_first td {
+#sliajbqrof .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#fcelvsiovs .gt_row_group_first th {
+#sliajbqrof .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#fcelvsiovs .gt_summary_row {
+#sliajbqrof .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -479,16 +425,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#fcelvsiovs .gt_first_summary_row {
+#sliajbqrof .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#fcelvsiovs .gt_first_summary_row.thick {
+#sliajbqrof .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#fcelvsiovs .gt_last_summary_row {
+#sliajbqrof .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -498,7 +444,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#fcelvsiovs .gt_grand_summary_row {
+#sliajbqrof .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -508,7 +454,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#fcelvsiovs .gt_first_grand_summary_row {
+#sliajbqrof .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -518,7 +464,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #D3D3D3;
 }
 
-#fcelvsiovs .gt_last_grand_summary_row_top {
+#sliajbqrof .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -528,11 +474,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#fcelvsiovs .gt_striped {
+#sliajbqrof .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#fcelvsiovs .gt_table_body {
+#sliajbqrof .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -541,7 +487,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#fcelvsiovs .gt_footnotes {
+#sliajbqrof .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -555,7 +501,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#fcelvsiovs .gt_footnote {
+#sliajbqrof .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -564,7 +510,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#fcelvsiovs .gt_sourcenotes {
+#sliajbqrof .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -578,7 +524,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#fcelvsiovs .gt_sourcenote {
+#sliajbqrof .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -586,179 +532,190 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#fcelvsiovs .gt_left {
+#sliajbqrof .gt_left {
   text-align: left;
 }
 
-#fcelvsiovs .gt_center {
+#sliajbqrof .gt_center {
   text-align: center;
 }
 
-#fcelvsiovs .gt_right {
+#sliajbqrof .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#fcelvsiovs .gt_font_normal {
+#sliajbqrof .gt_font_normal {
   font-weight: normal;
 }
 
-#fcelvsiovs .gt_font_bold {
+#sliajbqrof .gt_font_bold {
   font-weight: bold;
 }
 
-#fcelvsiovs .gt_font_italic {
+#sliajbqrof .gt_font_italic {
   font-style: italic;
 }
 
-#fcelvsiovs .gt_super {
+#sliajbqrof .gt_super {
   font-size: 65%;
 }
 
-#fcelvsiovs .gt_footnote_marks {
+#sliajbqrof .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#fcelvsiovs .gt_asterisk {
+#sliajbqrof .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#fcelvsiovs .gt_indent_1 {
+#sliajbqrof .gt_indent_1 {
   text-indent: 5px;
 }
 
-#fcelvsiovs .gt_indent_2 {
+#sliajbqrof .gt_indent_2 {
   text-indent: 10px;
 }
 
-#fcelvsiovs .gt_indent_3 {
+#sliajbqrof .gt_indent_3 {
   text-indent: 15px;
 }
 
-#fcelvsiovs .gt_indent_4 {
+#sliajbqrof .gt_indent_4 {
   text-indent: 20px;
 }
 
-#fcelvsiovs .gt_indent_5 {
+#sliajbqrof .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
 
 <table class="gt_table table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
-<tr class="header gt_heading">
-<th colspan="7" class="gt_heading gt_title gt_font_normal">Table 10.14. Livestock and Poultry Meat Production in ASEAN, 2018-2021</th>
-</tr>
-<tr class="odd gt_heading">
-<th colspan="7" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">(in thousand metric tons)</th>
-</tr>
-<tr class="header gt_col_headings gt_spanner_row">
-<th rowspan="2" id="year" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">year</th>
-<th rowspan="2" id="country" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">country</th>
-<th colspan="3" id="Livestock production" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><span class="gt_column_spanner">Livestock production</span></th>
-<th id="Poultry production" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="col"><span class="gt_column_spanner">Poultry production</span></th>
-<th rowspan="2" id="Total meat production" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Total meat production</th>
-</tr>
-<tr class="odd gt_col_headings">
-<th id="Beef and Buffalo Meat" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Beef and Buffalo Meat</th>
-<th id="Pig Meat" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Pig Meat</th>
-<th id="Mutton and Goat Meat" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Mutton and Goat Meat</th>
-<th id="Poultry Meat" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Poultry Meat</th>
+<tr class="header gt_col_headings">
+<th class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"></th>
+<th id="year" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">year</th>
+<th id="meat" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">meat</th>
+<th id="Brunei Darussalam" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Brunei Darussalam</th>
+<th id="Cambodia" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Cambodia</th>
+<th id="Indonesia" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Indonesia</th>
+<th id="Lao PDR" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Lao PDR</th>
+<th id="Malaysia" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Malaysia</th>
+<th id="Myanmar" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Myanmar</th>
+<th id="Philippines" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Philippines</th>
+<th id="Singapore" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Singapore</th>
+<th id="Thailand" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Thailand</th>
+<th id="Viet Nam" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Viet Nam</th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
 <tr class="odd">
-<td class="gt_row gt_center" headers="year">2021</td>
-<td class="gt_row gt_center" headers="country">Brunei Darussalam</td>
-<td class="gt_row gt_center" headers="Beef and Buffalo Meat">4.3</td>
-<td class="gt_row gt_center" headers="Pig Meat">0.0</td>
-<td class="gt_row gt_center" headers="Mutton and Goat Meat">0.1</td>
-<td class="gt_row gt_center" headers="Poultry Meat">31.6</td>
-<td class="gt_row gt_center" headers="Total_meat_production">36.0</td>
+<td id="stub_1_1" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">1</td>
+<td class="gt_row gt_right" headers="stub_1_1 year">2021</td>
+<td class="gt_row gt_left" headers="stub_1_1 meat">Beef and Buffalo Meat</td>
+<td class="gt_row gt_right" headers="stub_1_1 Brunei Darussalam">4.26741</td>
+<td class="gt_row gt_right" headers="stub_1_1 Cambodia">59.52424</td>
+<td class="gt_row gt_right" headers="stub_1_1 Indonesia">458.755</td>
+<td class="gt_row gt_right" headers="stub_1_1 Lao PDR">61.30639</td>
+<td class="gt_row gt_right" headers="stub_1_1 Malaysia">40.84550</td>
+<td class="gt_row gt_right" headers="stub_1_1 Myanmar">136.8980</td>
+<td class="gt_row gt_right" headers="stub_1_1 Philippines">182.72524</td>
+<td class="gt_row gt_right" headers="stub_1_1 Singapore">0.03425</td>
+<td class="gt_row gt_right" headers="stub_1_1 Thailand">154.55376</td>
+<td class="gt_row gt_right" headers="stub_1_1 Viet Nam">347.52345</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_center" headers="year">2021</td>
-<td class="gt_row gt_center" headers="country">Cambodia</td>
-<td class="gt_row gt_center" headers="Beef and Buffalo Meat">59.5</td>
-<td class="gt_row gt_center" headers="Pig Meat">107.4</td>
-<td class="gt_row gt_center" headers="Mutton and Goat Meat">NA</td>
-<td class="gt_row gt_center" headers="Poultry Meat">27.8</td>
-<td class="gt_row gt_center" headers="Total_meat_production">194.6</td>
+<td id="stub_1_2" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">2</td>
+<td class="gt_row gt_right" headers="stub_1_2 year">2021</td>
+<td class="gt_row gt_left" headers="stub_1_2 meat">Pig meat</td>
+<td class="gt_row gt_right" headers="stub_1_2 Brunei Darussalam">0.03135</td>
+<td class="gt_row gt_right" headers="stub_1_2 Cambodia">107.36374</td>
+<td class="gt_row gt_right" headers="stub_1_2 Indonesia">323.670</td>
+<td class="gt_row gt_right" headers="stub_1_2 Lao PDR">101.55963</td>
+<td class="gt_row gt_right" headers="stub_1_2 Malaysia">219.17860</td>
+<td class="gt_row gt_right" headers="stub_1_2 Myanmar">285.0000</td>
+<td class="gt_row gt_right" headers="stub_1_2 Philippines">1187.30473</td>
+<td class="gt_row gt_right" headers="stub_1_2 Singapore">31.25100</td>
+<td class="gt_row gt_right" headers="stub_1_2 Thailand">927.71694</td>
+<td class="gt_row gt_right" headers="stub_1_2 Viet Nam">2590.00000</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_center" headers="year">2021</td>
-<td class="gt_row gt_center" headers="country">Indonesia</td>
-<td class="gt_row gt_center" headers="Beef and Buffalo Meat">458.8</td>
-<td class="gt_row gt_center" headers="Pig Meat">323.7</td>
-<td class="gt_row gt_center" headers="Mutton and Goat Meat">117.6</td>
-<td class="gt_row gt_center" headers="Poultry Meat">3,888.5</td>
-<td class="gt_row gt_center" headers="Total_meat_production">4,788.6</td>
+<td id="stub_1_3" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">3</td>
+<td class="gt_row gt_right" headers="stub_1_3 year">2021</td>
+<td class="gt_row gt_left" headers="stub_1_3 meat">Mutton and Goat Meat</td>
+<td class="gt_row gt_right" headers="stub_1_3 Brunei Darussalam">0.07094</td>
+<td class="gt_row gt_right" headers="stub_1_3 Cambodia">NA</td>
+<td class="gt_row gt_right" headers="stub_1_3 Indonesia">117.588</td>
+<td class="gt_row gt_right" headers="stub_1_3 Lao PDR">2.82604</td>
+<td class="gt_row gt_right" headers="stub_1_3 Malaysia">3.61892</td>
+<td class="gt_row gt_right" headers="stub_1_3 Myanmar">12.0000</td>
+<td class="gt_row gt_right" headers="stub_1_3 Philippines">32.25285</td>
+<td class="gt_row gt_right" headers="stub_1_3 Singapore">0.03333</td>
+<td class="gt_row gt_right" headers="stub_1_3 Thailand">2.12822</td>
+<td class="gt_row gt_right" headers="stub_1_3 Viet Nam">21.34914</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_center" headers="year">2021</td>
-<td class="gt_row gt_center" headers="country">Lao PDR</td>
-<td class="gt_row gt_center" headers="Beef and Buffalo Meat">61.3</td>
-<td class="gt_row gt_center" headers="Pig Meat">101.6</td>
-<td class="gt_row gt_center" headers="Mutton and Goat Meat">2.8</td>
-<td class="gt_row gt_center" headers="Poultry Meat">43.2</td>
-<td class="gt_row gt_center" headers="Total_meat_production">208.9</td>
+<td id="stub_1_4" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">4</td>
+<td class="gt_row gt_right" headers="stub_1_4 year">2021</td>
+<td class="gt_row gt_left" headers="stub_1_4 meat">Poultry meat</td>
+<td class="gt_row gt_right" headers="stub_1_4 Brunei Darussalam">31.59257</td>
+<td class="gt_row gt_right" headers="stub_1_4 Cambodia">27.75546</td>
+<td class="gt_row gt_right" headers="stub_1_4 Indonesia">3888.544</td>
+<td class="gt_row gt_right" headers="stub_1_4 Lao PDR">43.18854</td>
+<td class="gt_row gt_right" headers="stub_1_4 Malaysia">1625.45250</td>
+<td class="gt_row gt_right" headers="stub_1_4 Myanmar">682.5421</td>
+<td class="gt_row gt_right" headers="stub_1_4 Philippines">1367.57174</td>
+<td class="gt_row gt_right" headers="stub_1_4 Singapore">84.80303</td>
+<td class="gt_row gt_right" headers="stub_1_4 Thailand">1844.91049</td>
+<td class="gt_row gt_right" headers="stub_1_4 Viet Nam">1702.91419</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_center" headers="year">2021</td>
-<td class="gt_row gt_center" headers="country">Malaysia</td>
-<td class="gt_row gt_center" headers="Beef and Buffalo Meat">40.8</td>
-<td class="gt_row gt_center" headers="Pig Meat">219.2</td>
-<td class="gt_row gt_center" headers="Mutton and Goat Meat">3.6</td>
-<td class="gt_row gt_center" headers="Poultry Meat">1,625.5</td>
-<td class="gt_row gt_center" headers="Total_meat_production">1,889.1</td>
+<td id="stub_1_5" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">5</td>
+<td class="gt_row gt_right" headers="stub_1_5 year">2020</td>
+<td class="gt_row gt_left" headers="stub_1_5 meat">Beef and Buffalo Meat</td>
+<td class="gt_row gt_right" headers="stub_1_5 Brunei Darussalam">2.39300</td>
+<td class="gt_row gt_right" headers="stub_1_5 Cambodia">61.23800</td>
+<td class="gt_row gt_right" headers="stub_1_5 Indonesia">540.503</td>
+<td class="gt_row gt_right" headers="stub_1_5 Lao PDR">59.01000</td>
+<td class="gt_row gt_right" headers="stub_1_5 Malaysia">43.49300</td>
+<td class="gt_row gt_right" headers="stub_1_5 Myanmar">511.7240</td>
+<td class="gt_row gt_right" headers="stub_1_5 Philippines">174.76800</td>
+<td class="gt_row gt_right" headers="stub_1_5 Singapore">0.03500</td>
+<td class="gt_row gt_right" headers="stub_1_5 Thailand">132.04300</td>
+<td class="gt_row gt_right" headers="stub_1_5 Viet Nam">470.34300</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_center" headers="year">2021</td>
-<td class="gt_row gt_center" headers="country">Myanmar</td>
-<td class="gt_row gt_center" headers="Beef and Buffalo Meat">136.9</td>
-<td class="gt_row gt_center" headers="Pig Meat">285.0</td>
-<td class="gt_row gt_center" headers="Mutton and Goat Meat">12.0</td>
-<td class="gt_row gt_center" headers="Poultry Meat">682.5</td>
-<td class="gt_row gt_center" headers="Total_meat_production">1,116.4</td>
+<td id="stub_1_6" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier; font-size: x-small; background-color: #E4E4E4">6..15</td>
+<td class="gt_row gt_right" headers="stub_1_6 year" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_left" headers="stub_1_6 meat" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Brunei Darussalam" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Cambodia" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Indonesia" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Lao PDR" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Malaysia" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Myanmar" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Philippines" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Singapore" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Thailand" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Viet Nam" style="background-color: #E4E4E4"></td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_center" headers="year">2021</td>
-<td class="gt_row gt_center" headers="country">Philippines</td>
-<td class="gt_row gt_center" headers="Beef and Buffalo Meat">182.7</td>
-<td class="gt_row gt_center" headers="Pig Meat">1,187.3</td>
-<td class="gt_row gt_center" headers="Mutton and Goat Meat">32.3</td>
-<td class="gt_row gt_center" headers="Poultry Meat">1,367.6</td>
-<td class="gt_row gt_center" headers="Total_meat_production">2,769.9</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_center" headers="year">2021</td>
-<td class="gt_row gt_center" headers="country">Singapore</td>
-<td class="gt_row gt_center" headers="Beef and Buffalo Meat">0.0</td>
-<td class="gt_row gt_center" headers="Pig Meat">31.3</td>
-<td class="gt_row gt_center" headers="Mutton and Goat Meat">0.0</td>
-<td class="gt_row gt_center" headers="Poultry Meat">84.8</td>
-<td class="gt_row gt_center" headers="Total_meat_production">116.1</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_center" headers="year">2021</td>
-<td class="gt_row gt_center" headers="country">Thailand</td>
-<td class="gt_row gt_center" headers="Beef and Buffalo Meat">154.6</td>
-<td class="gt_row gt_center" headers="Pig Meat">927.7</td>
-<td class="gt_row gt_center" headers="Mutton and Goat Meat">2.1</td>
-<td class="gt_row gt_center" headers="Poultry Meat">1,844.9</td>
-<td class="gt_row gt_center" headers="Total_meat_production">2,929.3</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_center" headers="year">2021</td>
-<td class="gt_row gt_center" headers="country">Viet Nam</td>
-<td class="gt_row gt_center" headers="Beef and Buffalo Meat">347.5</td>
-<td class="gt_row gt_center" headers="Pig Meat">2,590.0</td>
-<td class="gt_row gt_center" headers="Mutton and Goat Meat">21.3</td>
-<td class="gt_row gt_center" headers="Poultry Meat">1,702.9</td>
-<td class="gt_row gt_center" headers="Total_meat_production">4,661.8</td>
+<td id="stub_1_7" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">16</td>
+<td class="gt_row gt_right" headers="stub_1_7 year">2018</td>
+<td class="gt_row gt_left" headers="stub_1_7 meat">Poultry meat</td>
+<td class="gt_row gt_right" headers="stub_1_7 Brunei Darussalam">25.30000</td>
+<td class="gt_row gt_right" headers="stub_1_7 Cambodia">27.28600</td>
+<td class="gt_row gt_right" headers="stub_1_7 Indonesia">2588.164</td>
+<td class="gt_row gt_right" headers="stub_1_7 Lao PDR">30.83800</td>
+<td class="gt_row gt_right" headers="stub_1_7 Malaysia">1873.03700</td>
+<td class="gt_row gt_right" headers="stub_1_7 Myanmar">1896.3580</td>
+<td class="gt_row gt_right" headers="stub_1_7 Philippines">1379.81800</td>
+<td class="gt_row gt_right" headers="stub_1_7 Singapore">106.75000</td>
+<td class="gt_row gt_right" headers="stub_1_7 Thailand">1779.84300</td>
+<td class="gt_row gt_right" headers="stub_1_7 Viet Nam">947.01800</td>
 </tr>
 </tbody>
 </table>
@@ -767,9 +724,2131 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+</section>
+<section id="append-asean-column" class="level2">
+<h2 class="anchored" data-anchor-id="append-asean-column">2.2 <strong>Append ASEAN Column</strong></h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply styling to your R script</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">style_file</span>(<span class="st">"Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the total meat production for each animal type and year</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>raw_data <span class="ot">&lt;-</span> raw_data <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ASEAN =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="sc">-</span><span class="fu">c</span>(year, meat)), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Preview the data using gt</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">gt_preview</span>(raw_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<div id="rpmnqdiutt" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#rpmnqdiutt table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#rpmnqdiutt thead, #rpmnqdiutt tbody, #rpmnqdiutt tfoot, #rpmnqdiutt tr, #rpmnqdiutt td, #rpmnqdiutt th {
+  border-style: none;
+}
+
+#rpmnqdiutt p {
+  margin: 0;
+  padding: 0;
+}
+
+#rpmnqdiutt .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#rpmnqdiutt .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#rpmnqdiutt .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#rpmnqdiutt .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#rpmnqdiutt .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#rpmnqdiutt .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#rpmnqdiutt .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#rpmnqdiutt .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#rpmnqdiutt .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#rpmnqdiutt .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#rpmnqdiutt .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#rpmnqdiutt .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#rpmnqdiutt .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#rpmnqdiutt .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#rpmnqdiutt .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#rpmnqdiutt .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#rpmnqdiutt .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#rpmnqdiutt .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#rpmnqdiutt .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#rpmnqdiutt .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#rpmnqdiutt .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#rpmnqdiutt .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#rpmnqdiutt .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#rpmnqdiutt .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#rpmnqdiutt .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#rpmnqdiutt .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#rpmnqdiutt .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#rpmnqdiutt .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#rpmnqdiutt .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#rpmnqdiutt .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#rpmnqdiutt .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#rpmnqdiutt .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#rpmnqdiutt .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#rpmnqdiutt .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#rpmnqdiutt .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#rpmnqdiutt .gt_left {
+  text-align: left;
+}
+
+#rpmnqdiutt .gt_center {
+  text-align: center;
+}
+
+#rpmnqdiutt .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#rpmnqdiutt .gt_font_normal {
+  font-weight: normal;
+}
+
+#rpmnqdiutt .gt_font_bold {
+  font-weight: bold;
+}
+
+#rpmnqdiutt .gt_font_italic {
+  font-style: italic;
+}
+
+#rpmnqdiutt .gt_super {
+  font-size: 65%;
+}
+
+#rpmnqdiutt .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#rpmnqdiutt .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#rpmnqdiutt .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#rpmnqdiutt .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#rpmnqdiutt .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#rpmnqdiutt .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#rpmnqdiutt .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+
+<table class="gt_table table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="header gt_col_headings">
+<th class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"></th>
+<th id="year" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">year</th>
+<th id="meat" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">meat</th>
+<th id="Brunei Darussalam" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Brunei Darussalam</th>
+<th id="Cambodia" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Cambodia</th>
+<th id="Indonesia" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Indonesia</th>
+<th id="Lao PDR" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Lao PDR</th>
+<th id="Malaysia" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Malaysia</th>
+<th id="Myanmar" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Myanmar</th>
+<th id="Philippines" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Philippines</th>
+<th id="Singapore" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Singapore</th>
+<th id="Thailand" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Thailand</th>
+<th id="Viet Nam" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Viet Nam</th>
+<th id="ASEAN" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">ASEAN</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td id="stub_1_1" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">1</td>
+<td class="gt_row gt_right" headers="stub_1_1 year">2021</td>
+<td class="gt_row gt_left" headers="stub_1_1 meat">Beef and Buffalo Meat</td>
+<td class="gt_row gt_right" headers="stub_1_1 Brunei Darussalam">4.26741</td>
+<td class="gt_row gt_right" headers="stub_1_1 Cambodia">59.52424</td>
+<td class="gt_row gt_right" headers="stub_1_1 Indonesia">458.755</td>
+<td class="gt_row gt_right" headers="stub_1_1 Lao PDR">61.30639</td>
+<td class="gt_row gt_right" headers="stub_1_1 Malaysia">40.84550</td>
+<td class="gt_row gt_right" headers="stub_1_1 Myanmar">136.8980</td>
+<td class="gt_row gt_right" headers="stub_1_1 Philippines">182.72524</td>
+<td class="gt_row gt_right" headers="stub_1_1 Singapore">0.03425</td>
+<td class="gt_row gt_right" headers="stub_1_1 Thailand">154.55376</td>
+<td class="gt_row gt_right" headers="stub_1_1 Viet Nam">347.52345</td>
+<td class="gt_row gt_right" headers="stub_1_1 ASEAN">1446.4332</td>
+</tr>
+<tr class="even">
+<td id="stub_1_2" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">2</td>
+<td class="gt_row gt_right" headers="stub_1_2 year">2021</td>
+<td class="gt_row gt_left" headers="stub_1_2 meat">Pig meat</td>
+<td class="gt_row gt_right" headers="stub_1_2 Brunei Darussalam">0.03135</td>
+<td class="gt_row gt_right" headers="stub_1_2 Cambodia">107.36374</td>
+<td class="gt_row gt_right" headers="stub_1_2 Indonesia">323.670</td>
+<td class="gt_row gt_right" headers="stub_1_2 Lao PDR">101.55963</td>
+<td class="gt_row gt_right" headers="stub_1_2 Malaysia">219.17860</td>
+<td class="gt_row gt_right" headers="stub_1_2 Myanmar">285.0000</td>
+<td class="gt_row gt_right" headers="stub_1_2 Philippines">1187.30473</td>
+<td class="gt_row gt_right" headers="stub_1_2 Singapore">31.25100</td>
+<td class="gt_row gt_right" headers="stub_1_2 Thailand">927.71694</td>
+<td class="gt_row gt_right" headers="stub_1_2 Viet Nam">2590.00000</td>
+<td class="gt_row gt_right" headers="stub_1_2 ASEAN">5773.0760</td>
+</tr>
+<tr class="odd">
+<td id="stub_1_3" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">3</td>
+<td class="gt_row gt_right" headers="stub_1_3 year">2021</td>
+<td class="gt_row gt_left" headers="stub_1_3 meat">Mutton and Goat Meat</td>
+<td class="gt_row gt_right" headers="stub_1_3 Brunei Darussalam">0.07094</td>
+<td class="gt_row gt_right" headers="stub_1_3 Cambodia">NA</td>
+<td class="gt_row gt_right" headers="stub_1_3 Indonesia">117.588</td>
+<td class="gt_row gt_right" headers="stub_1_3 Lao PDR">2.82604</td>
+<td class="gt_row gt_right" headers="stub_1_3 Malaysia">3.61892</td>
+<td class="gt_row gt_right" headers="stub_1_3 Myanmar">12.0000</td>
+<td class="gt_row gt_right" headers="stub_1_3 Philippines">32.25285</td>
+<td class="gt_row gt_right" headers="stub_1_3 Singapore">0.03333</td>
+<td class="gt_row gt_right" headers="stub_1_3 Thailand">2.12822</td>
+<td class="gt_row gt_right" headers="stub_1_3 Viet Nam">21.34914</td>
+<td class="gt_row gt_right" headers="stub_1_3 ASEAN">191.8674</td>
+</tr>
+<tr class="even">
+<td id="stub_1_4" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">4</td>
+<td class="gt_row gt_right" headers="stub_1_4 year">2021</td>
+<td class="gt_row gt_left" headers="stub_1_4 meat">Poultry meat</td>
+<td class="gt_row gt_right" headers="stub_1_4 Brunei Darussalam">31.59257</td>
+<td class="gt_row gt_right" headers="stub_1_4 Cambodia">27.75546</td>
+<td class="gt_row gt_right" headers="stub_1_4 Indonesia">3888.544</td>
+<td class="gt_row gt_right" headers="stub_1_4 Lao PDR">43.18854</td>
+<td class="gt_row gt_right" headers="stub_1_4 Malaysia">1625.45250</td>
+<td class="gt_row gt_right" headers="stub_1_4 Myanmar">682.5421</td>
+<td class="gt_row gt_right" headers="stub_1_4 Philippines">1367.57174</td>
+<td class="gt_row gt_right" headers="stub_1_4 Singapore">84.80303</td>
+<td class="gt_row gt_right" headers="stub_1_4 Thailand">1844.91049</td>
+<td class="gt_row gt_right" headers="stub_1_4 Viet Nam">1702.91419</td>
+<td class="gt_row gt_right" headers="stub_1_4 ASEAN">11299.2746</td>
+</tr>
+<tr class="odd">
+<td id="stub_1_5" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">5</td>
+<td class="gt_row gt_right" headers="stub_1_5 year">2020</td>
+<td class="gt_row gt_left" headers="stub_1_5 meat">Beef and Buffalo Meat</td>
+<td class="gt_row gt_right" headers="stub_1_5 Brunei Darussalam">2.39300</td>
+<td class="gt_row gt_right" headers="stub_1_5 Cambodia">61.23800</td>
+<td class="gt_row gt_right" headers="stub_1_5 Indonesia">540.503</td>
+<td class="gt_row gt_right" headers="stub_1_5 Lao PDR">59.01000</td>
+<td class="gt_row gt_right" headers="stub_1_5 Malaysia">43.49300</td>
+<td class="gt_row gt_right" headers="stub_1_5 Myanmar">511.7240</td>
+<td class="gt_row gt_right" headers="stub_1_5 Philippines">174.76800</td>
+<td class="gt_row gt_right" headers="stub_1_5 Singapore">0.03500</td>
+<td class="gt_row gt_right" headers="stub_1_5 Thailand">132.04300</td>
+<td class="gt_row gt_right" headers="stub_1_5 Viet Nam">470.34300</td>
+<td class="gt_row gt_right" headers="stub_1_5 ASEAN">1995.5500</td>
+</tr>
+<tr class="even">
+<td id="stub_1_6" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier; font-size: x-small; background-color: #E4E4E4">6..15</td>
+<td class="gt_row gt_right" headers="stub_1_6 year" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_left" headers="stub_1_6 meat" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Brunei Darussalam" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Cambodia" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Indonesia" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Lao PDR" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Malaysia" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Myanmar" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Philippines" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Singapore" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Thailand" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Viet Nam" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 ASEAN" style="background-color: #E4E4E4"></td>
+</tr>
+<tr class="odd">
+<td id="stub_1_7" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">16</td>
+<td class="gt_row gt_right" headers="stub_1_7 year">2018</td>
+<td class="gt_row gt_left" headers="stub_1_7 meat">Poultry meat</td>
+<td class="gt_row gt_right" headers="stub_1_7 Brunei Darussalam">25.30000</td>
+<td class="gt_row gt_right" headers="stub_1_7 Cambodia">27.28600</td>
+<td class="gt_row gt_right" headers="stub_1_7 Indonesia">2588.164</td>
+<td class="gt_row gt_right" headers="stub_1_7 Lao PDR">30.83800</td>
+<td class="gt_row gt_right" headers="stub_1_7 Malaysia">1873.03700</td>
+<td class="gt_row gt_right" headers="stub_1_7 Myanmar">1896.3580</td>
+<td class="gt_row gt_right" headers="stub_1_7 Philippines">1379.81800</td>
+<td class="gt_row gt_right" headers="stub_1_7 Singapore">106.75000</td>
+<td class="gt_row gt_right" headers="stub_1_7 Thailand">1779.84300</td>
+<td class="gt_row gt_right" headers="stub_1_7 Viet Nam">947.01800</td>
+<td class="gt_row gt_right" headers="stub_1_7 ASEAN">10654.4120</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="insert-livestock-and-poultry-production-rows" class="level2">
+<h2 class="anchored" data-anchor-id="insert-livestock-and-poultry-production-rows"><strong>2.3 Insert Livestock and Poultry Production Rows</strong></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a function to add "Livestock production" and "Poultry production" rows</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>add_production_rows <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  livestock_row <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(meat <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Beef and Buffalo Meat"</span>, <span class="st">"Goat Meat"</span>, <span class="st">"Sheep Meat"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">meat =</span> <span class="st">"Livestock production"</span>, <span class="fu">across</span>(<span class="sc">-</span><span class="fu">c</span>(meat), <span class="sc">~</span><span class="cn">NA_real_</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  poultry_row <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(meat <span class="sc">==</span> <span class="st">"Poultry meat"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">meat =</span> <span class="st">"Poultry production"</span>, <span class="fu">across</span>(<span class="sc">-</span><span class="fu">c</span>(meat), <span class="sc">~</span><span class="cn">NA_real_</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(df, livestock_row, poultry_row) <span class="sc">%&gt;%</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(year, meat)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Add the "Livestock production" and "Poultry production" rows</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>raw_data <span class="ot">&lt;-</span> <span class="fu">add_production_rows</span>(raw_data)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>totals <span class="ot">&lt;-</span> raw_data <span class="sc">%&gt;%</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), sum, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">meat =</span> <span class="st">"Total meat production"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There was 1 warning in `summarize()`.
+ℹ In argument: `across(where(is.numeric), sum, na.rm = TRUE)`.
+ℹ In group 1: `year = 2018`.
+Caused by warning:
+! The `...` argument of `across()` is deprecated as of dplyr 1.1.0.
+Supply arguments directly to `.fns` through an anonymous function instead.
+
+  # Previously
+  across(a:b, mean, na.rm = TRUE)
+
+  # Now
+  across(a:b, \(x) mean(x, na.rm = TRUE))</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>with_totals <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(raw_data, totals) <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(year, meat)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">gt_preview</span>(with_totals)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<div id="ibfiktadhb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ibfiktadhb table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#ibfiktadhb thead, #ibfiktadhb tbody, #ibfiktadhb tfoot, #ibfiktadhb tr, #ibfiktadhb td, #ibfiktadhb th {
+  border-style: none;
+}
+
+#ibfiktadhb p {
+  margin: 0;
+  padding: 0;
+}
+
+#ibfiktadhb .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ibfiktadhb .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#ibfiktadhb .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ibfiktadhb .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ibfiktadhb .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ibfiktadhb .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ibfiktadhb .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ibfiktadhb .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ibfiktadhb .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ibfiktadhb .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ibfiktadhb .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ibfiktadhb .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ibfiktadhb .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#ibfiktadhb .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#ibfiktadhb .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ibfiktadhb .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ibfiktadhb .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ibfiktadhb .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ibfiktadhb .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ibfiktadhb .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#ibfiktadhb .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#ibfiktadhb .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#ibfiktadhb .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ibfiktadhb .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#ibfiktadhb .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#ibfiktadhb .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ibfiktadhb .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ibfiktadhb .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ibfiktadhb .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ibfiktadhb .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ibfiktadhb .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ibfiktadhb .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ibfiktadhb .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ibfiktadhb .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ibfiktadhb .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ibfiktadhb .gt_left {
+  text-align: left;
+}
+
+#ibfiktadhb .gt_center {
+  text-align: center;
+}
+
+#ibfiktadhb .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ibfiktadhb .gt_font_normal {
+  font-weight: normal;
+}
+
+#ibfiktadhb .gt_font_bold {
+  font-weight: bold;
+}
+
+#ibfiktadhb .gt_font_italic {
+  font-style: italic;
+}
+
+#ibfiktadhb .gt_super {
+  font-size: 65%;
+}
+
+#ibfiktadhb .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#ibfiktadhb .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#ibfiktadhb .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#ibfiktadhb .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#ibfiktadhb .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#ibfiktadhb .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#ibfiktadhb .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+
+<table class="gt_table table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="header gt_col_headings">
+<th class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"></th>
+<th id="year" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">year</th>
+<th id="meat" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">meat</th>
+<th id="Brunei Darussalam" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Brunei Darussalam</th>
+<th id="Cambodia" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Cambodia</th>
+<th id="Indonesia" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Indonesia</th>
+<th id="Lao PDR" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Lao PDR</th>
+<th id="Malaysia" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Malaysia</th>
+<th id="Myanmar" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Myanmar</th>
+<th id="Philippines" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Philippines</th>
+<th id="Singapore" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Singapore</th>
+<th id="Thailand" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Thailand</th>
+<th id="Viet Nam" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Viet Nam</th>
+<th id="ASEAN" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">ASEAN</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td id="stub_1_1" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">1</td>
+<td class="gt_row gt_right" headers="stub_1_1 year">2018</td>
+<td class="gt_row gt_left" headers="stub_1_1 meat">Beef and Buffalo Meat</td>
+<td class="gt_row gt_right" headers="stub_1_1 Brunei Darussalam">0.71800</td>
+<td class="gt_row gt_right" headers="stub_1_1 Cambodia">66.6880</td>
+<td class="gt_row gt_right" headers="stub_1_1 Indonesia">563.161</td>
+<td class="gt_row gt_right" headers="stub_1_1 Lao PDR">53.3710</td>
+<td class="gt_row gt_right" headers="stub_1_1 Malaysia">51.301</td>
+<td class="gt_row gt_right" headers="stub_1_1 Myanmar">469.880</td>
+<td class="gt_row gt_right" headers="stub_1_1 Philippines">310.720</td>
+<td class="gt_row gt_right" headers="stub_1_1 Singapore">0.0470</td>
+<td class="gt_row gt_right" headers="stub_1_1 Thailand">151.730</td>
+<td class="gt_row gt_right" headers="stub_1_1 Viet Nam">426.582</td>
+<td class="gt_row gt_right" headers="stub_1_1 ASEAN">2094.198</td>
+</tr>
+<tr class="even">
+<td id="stub_1_2" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">2</td>
+<td class="gt_row gt_right" headers="stub_1_2 year">2018</td>
+<td class="gt_row gt_left" headers="stub_1_2 meat">Livestock production</td>
+<td class="gt_row gt_right" headers="stub_1_2 Brunei Darussalam">NA</td>
+<td class="gt_row gt_right" headers="stub_1_2 Cambodia">NA</td>
+<td class="gt_row gt_right" headers="stub_1_2 Indonesia">NA</td>
+<td class="gt_row gt_right" headers="stub_1_2 Lao PDR">NA</td>
+<td class="gt_row gt_right" headers="stub_1_2 Malaysia">NA</td>
+<td class="gt_row gt_right" headers="stub_1_2 Myanmar">NA</td>
+<td class="gt_row gt_right" headers="stub_1_2 Philippines">NA</td>
+<td class="gt_row gt_right" headers="stub_1_2 Singapore">NA</td>
+<td class="gt_row gt_right" headers="stub_1_2 Thailand">NA</td>
+<td class="gt_row gt_right" headers="stub_1_2 Viet Nam">NA</td>
+<td class="gt_row gt_right" headers="stub_1_2 ASEAN">NA</td>
+</tr>
+<tr class="odd">
+<td id="stub_1_3" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">3</td>
+<td class="gt_row gt_right" headers="stub_1_3 year">2018</td>
+<td class="gt_row gt_left" headers="stub_1_3 meat">Mutton and Goat Meat</td>
+<td class="gt_row gt_right" headers="stub_1_3 Brunei Darussalam">0.06000</td>
+<td class="gt_row gt_right" headers="stub_1_3 Cambodia">NA</td>
+<td class="gt_row gt_right" headers="stub_1_3 Indonesia">115.533</td>
+<td class="gt_row gt_right" headers="stub_1_3 Lao PDR">1.9640</td>
+<td class="gt_row gt_right" headers="stub_1_3 Malaysia">3.154</td>
+<td class="gt_row gt_right" headers="stub_1_3 Myanmar">99.476</td>
+<td class="gt_row gt_right" headers="stub_1_3 Philippines">60.672</td>
+<td class="gt_row gt_right" headers="stub_1_3 Singapore">0.0360</td>
+<td class="gt_row gt_right" headers="stub_1_3 Thailand">2.144</td>
+<td class="gt_row gt_right" headers="stub_1_3 Viet Nam">8.992</td>
+<td class="gt_row gt_right" headers="stub_1_3 ASEAN">292.031</td>
+</tr>
+<tr class="even">
+<td id="stub_1_4" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">4</td>
+<td class="gt_row gt_right" headers="stub_1_4 year">2018</td>
+<td class="gt_row gt_left" headers="stub_1_4 meat">Pig meat</td>
+<td class="gt_row gt_right" headers="stub_1_4 Brunei Darussalam">0.05000</td>
+<td class="gt_row gt_right" headers="stub_1_4 Cambodia">86.4800</td>
+<td class="gt_row gt_right" headers="stub_1_4 Indonesia">327.215</td>
+<td class="gt_row gt_right" headers="stub_1_4 Lao PDR">70.3450</td>
+<td class="gt_row gt_right" headers="stub_1_4 Malaysia">186.012</td>
+<td class="gt_row gt_right" headers="stub_1_4 Myanmar">1063.087</td>
+<td class="gt_row gt_right" headers="stub_1_4 Philippines">1873.063</td>
+<td class="gt_row gt_right" headers="stub_1_4 Singapore">18.5080</td>
+<td class="gt_row gt_right" headers="stub_1_4 Thailand">999.227</td>
+<td class="gt_row gt_right" headers="stub_1_4 Viet Nam">3816.414</td>
+<td class="gt_row gt_right" headers="stub_1_4 ASEAN">8440.401</td>
+</tr>
+<tr class="odd">
+<td id="stub_1_5" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">5</td>
+<td class="gt_row gt_right" headers="stub_1_5 year">2018</td>
+<td class="gt_row gt_left" headers="stub_1_5 meat">Poultry meat</td>
+<td class="gt_row gt_right" headers="stub_1_5 Brunei Darussalam">25.30000</td>
+<td class="gt_row gt_right" headers="stub_1_5 Cambodia">27.2860</td>
+<td class="gt_row gt_right" headers="stub_1_5 Indonesia">2588.164</td>
+<td class="gt_row gt_right" headers="stub_1_5 Lao PDR">30.8380</td>
+<td class="gt_row gt_right" headers="stub_1_5 Malaysia">1873.037</td>
+<td class="gt_row gt_right" headers="stub_1_5 Myanmar">1896.358</td>
+<td class="gt_row gt_right" headers="stub_1_5 Philippines">1379.818</td>
+<td class="gt_row gt_right" headers="stub_1_5 Singapore">106.7500</td>
+<td class="gt_row gt_right" headers="stub_1_5 Thailand">1779.843</td>
+<td class="gt_row gt_right" headers="stub_1_5 Viet Nam">947.018</td>
+<td class="gt_row gt_right" headers="stub_1_5 ASEAN">10654.412</td>
+</tr>
+<tr class="even">
+<td id="stub_1_6" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier; font-size: x-small; background-color: #E4E4E4">6..27</td>
+<td class="gt_row gt_right" headers="stub_1_6 year" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_left" headers="stub_1_6 meat" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Brunei Darussalam" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Cambodia" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Indonesia" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Lao PDR" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Malaysia" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Myanmar" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Philippines" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Singapore" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Thailand" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 Viet Nam" style="background-color: #E4E4E4"></td>
+<td class="gt_row gt_right" headers="stub_1_6 ASEAN" style="background-color: #E4E4E4"></td>
+</tr>
+<tr class="odd">
+<td id="stub_1_7" class="gt_row gt_right gt_stub" data-quarto-table-cell-role="th" scope="row" style="font-family: Courier">28</td>
+<td class="gt_row gt_right" headers="stub_1_7 year">2021</td>
+<td class="gt_row gt_left" headers="stub_1_7 meat">Total meat production</td>
+<td class="gt_row gt_right" headers="stub_1_7 Brunei Darussalam">35.96227</td>
+<td class="gt_row gt_right" headers="stub_1_7 Cambodia">194.6434</td>
+<td class="gt_row gt_right" headers="stub_1_7 Indonesia">4788.557</td>
+<td class="gt_row gt_right" headers="stub_1_7 Lao PDR">208.8806</td>
+<td class="gt_row gt_right" headers="stub_1_7 Malaysia">1889.096</td>
+<td class="gt_row gt_right" headers="stub_1_7 Myanmar">1116.440</td>
+<td class="gt_row gt_right" headers="stub_1_7 Philippines">2769.855</td>
+<td class="gt_row gt_right" headers="stub_1_7 Singapore">116.1216</td>
+<td class="gt_row gt_right" headers="stub_1_7 Thailand">2929.309</td>
+<td class="gt_row gt_right" headers="stub_1_7 Viet Nam">4661.787</td>
+<td class="gt_row gt_right" headers="stub_1_7 ASEAN">18710.651</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="gt-table" class="level2">
+<h2 class="anchored" data-anchor-id="gt-table"><strong>gt table</strong></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>with_totals <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(<span class="at">rowname_col =</span> <span class="st">"meat"</span>, <span class="at">groupname_col =</span> <span class="st">"year"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_options</span>(</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">table.font.size =</span> <span class="fu">px</span>(<span class="dv">9</span>),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">heading.title.font.size =</span> <span class="fu">px</span>(<span class="dv">14</span>),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">heading.title.font.weight =</span> <span class="st">"bold"</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">md</span>(<span class="st">"**Livestock and Poultry Meat Production in ASEAN, 2018–2021**"</span>),</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">md</span>(<span class="st">"*&lt;p style=</span><span class="sc">\"</span><span class="st">text-align: right;</span><span class="sc">\"</span><span class="st">&gt;_(in thousand metric ton)_*&lt;/p&gt;"</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_stubhead</span>(</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="fu">md</span>(<span class="st">"**Animal Type**"</span>)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_spanner</span>(</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="fu">md</span>(<span class="st">"**Year**"</span>),</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>()</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">footnote =</span> <span class="fu">md</span>(<span class="st">"*Note: ‘-’ not available at the time of publication*"</span>)</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_source_note</span>(</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">source_note =</span> <span class="fu">md</span>(<span class="st">"*Source: FAOSTAT database*"</span>)</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">1</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_missing</span>(</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_text =</span> <span class="st">"-"</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_missing</span>(</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">rows =</span> <span class="fu">matches</span>(<span class="st">"Livestock production"</span>),</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_text =</span> <span class="st">""</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_missing</span>(</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">rows =</span> <span class="fu">matches</span>(<span class="st">"Poultry production"</span>),</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_text =</span> <span class="st">""</span></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_width</span>(</span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stub</span>() <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">150</span>)</span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Since gt v0.6.0 the `fmt_missing()` function is deprecated and will soon be
+removed.
+• Use the `sub_missing()` function instead.
+This warning is displayed once every 8 hours.</code></pre>
+</div>
+<div class="cell-output-display">
+<div id="esnvsnnhvd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#esnvsnnhvd table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#esnvsnnhvd thead, #esnvsnnhvd tbody, #esnvsnnhvd tfoot, #esnvsnnhvd tr, #esnvsnnhvd td, #esnvsnnhvd th {
+  border-style: none;
+}
+
+#esnvsnnhvd p {
+  margin: 0;
+  padding: 0;
+}
+
+#esnvsnnhvd .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 9px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#esnvsnnhvd .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#esnvsnnhvd .gt_title {
+  color: #333333;
+  font-size: 14px;
+  font-weight: bold;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#esnvsnnhvd .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#esnvsnnhvd .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#esnvsnnhvd .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#esnvsnnhvd .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#esnvsnnhvd .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#esnvsnnhvd .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#esnvsnnhvd .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#esnvsnnhvd .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#esnvsnnhvd .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#esnvsnnhvd .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#esnvsnnhvd .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#esnvsnnhvd .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#esnvsnnhvd .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#esnvsnnhvd .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#esnvsnnhvd .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#esnvsnnhvd .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#esnvsnnhvd .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#esnvsnnhvd .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#esnvsnnhvd .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#esnvsnnhvd .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#esnvsnnhvd .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#esnvsnnhvd .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#esnvsnnhvd .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#esnvsnnhvd .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#esnvsnnhvd .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#esnvsnnhvd .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#esnvsnnhvd .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#esnvsnnhvd .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#esnvsnnhvd .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#esnvsnnhvd .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#esnvsnnhvd .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#esnvsnnhvd .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#esnvsnnhvd .gt_left {
+  text-align: left;
+}
+
+#esnvsnnhvd .gt_center {
+  text-align: center;
+}
+
+#esnvsnnhvd .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#esnvsnnhvd .gt_font_normal {
+  font-weight: normal;
+}
+
+#esnvsnnhvd .gt_font_bold {
+  font-weight: bold;
+}
+
+#esnvsnnhvd .gt_font_italic {
+  font-style: italic;
+}
+
+#esnvsnnhvd .gt_super {
+  font-size: 65%;
+}
+
+#esnvsnnhvd .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#esnvsnnhvd .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#esnvsnnhvd .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#esnvsnnhvd .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#esnvsnnhvd .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#esnvsnnhvd .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#esnvsnnhvd .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" style="table-layout: fixed;" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <colgroup>
+    <col style="width:150px;">
+    <col>
+    <col>
+    <col>
+    <col>
+    <col>
+    <col>
+    <col>
+    <col>
+    <col>
+    <col>
+    <col>
+  </colgroup>
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="12" class="gt_heading gt_title gt_font_normal" style=""><strong>Livestock and Poultry Meat Production in ASEAN, 2018–2021</strong></td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="12" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style=""><em></em><p style="text-align: right;"><em><em>(in thousand metric ton)</em></em></p></td>
+    </tr>
+    <tr class="gt_col_headings gt_spanner_row">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" scope="col" id="<strong>Animal Type</strong>"><strong>Animal Type</strong></th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="11" scope="colgroup" id="<strong>Year</strong>">
+        <span class="gt_column_spanner"><strong>Year</strong></span>
+      </th>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Brunei Darussalam">Brunei Darussalam</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Cambodia">Cambodia</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Indonesia">Indonesia</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Lao PDR">Lao PDR</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Malaysia">Malaysia</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Myanmar">Myanmar</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Philippines">Philippines</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Singapore">Singapore</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Thailand">Thailand</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Viet Nam">Viet Nam</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="ASEAN">ASEAN</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr class="gt_group_heading_row">
+      <th colspan="12" class="gt_group_heading" scope="colgroup" id="2018">2018</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_1" scope="row" class="gt_row gt_left gt_stub">Beef and Buffalo Meat</th>
+<td headers="2018 stub_1_1 Brunei Darussalam" class="gt_row gt_right">0.7</td>
+<td headers="2018 stub_1_1 Cambodia" class="gt_row gt_right">66.7</td>
+<td headers="2018 stub_1_1 Indonesia" class="gt_row gt_right">563.2</td>
+<td headers="2018 stub_1_1 Lao PDR" class="gt_row gt_right">53.4</td>
+<td headers="2018 stub_1_1 Malaysia" class="gt_row gt_right">51.3</td>
+<td headers="2018 stub_1_1 Myanmar" class="gt_row gt_right">469.9</td>
+<td headers="2018 stub_1_1 Philippines" class="gt_row gt_right">310.7</td>
+<td headers="2018 stub_1_1 Singapore" class="gt_row gt_right">0.0</td>
+<td headers="2018 stub_1_1 Thailand" class="gt_row gt_right">151.7</td>
+<td headers="2018 stub_1_1 Viet Nam" class="gt_row gt_right">426.6</td>
+<td headers="2018 stub_1_1 ASEAN" class="gt_row gt_right">2,094.2</td></tr>
+    <tr><th id="stub_1_2" scope="row" class="gt_row gt_left gt_stub">Livestock production</th>
+<td headers="2018 stub_1_2 Brunei Darussalam" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_2 Cambodia" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_2 Indonesia" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_2 Lao PDR" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_2 Malaysia" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_2 Myanmar" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_2 Philippines" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_2 Singapore" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_2 Thailand" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_2 Viet Nam" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_2 ASEAN" class="gt_row gt_right"><br></td></tr>
+    <tr><th id="stub_1_3" scope="row" class="gt_row gt_left gt_stub">Mutton and Goat Meat</th>
+<td headers="2018 stub_1_3 Brunei Darussalam" class="gt_row gt_right">0.1</td>
+<td headers="2018 stub_1_3 Cambodia" class="gt_row gt_right">-</td>
+<td headers="2018 stub_1_3 Indonesia" class="gt_row gt_right">115.5</td>
+<td headers="2018 stub_1_3 Lao PDR" class="gt_row gt_right">2.0</td>
+<td headers="2018 stub_1_3 Malaysia" class="gt_row gt_right">3.2</td>
+<td headers="2018 stub_1_3 Myanmar" class="gt_row gt_right">99.5</td>
+<td headers="2018 stub_1_3 Philippines" class="gt_row gt_right">60.7</td>
+<td headers="2018 stub_1_3 Singapore" class="gt_row gt_right">0.0</td>
+<td headers="2018 stub_1_3 Thailand" class="gt_row gt_right">2.1</td>
+<td headers="2018 stub_1_3 Viet Nam" class="gt_row gt_right">9.0</td>
+<td headers="2018 stub_1_3 ASEAN" class="gt_row gt_right">292.0</td></tr>
+    <tr><th id="stub_1_4" scope="row" class="gt_row gt_left gt_stub">Pig meat</th>
+<td headers="2018 stub_1_4 Brunei Darussalam" class="gt_row gt_right">0.0</td>
+<td headers="2018 stub_1_4 Cambodia" class="gt_row gt_right">86.5</td>
+<td headers="2018 stub_1_4 Indonesia" class="gt_row gt_right">327.2</td>
+<td headers="2018 stub_1_4 Lao PDR" class="gt_row gt_right">70.3</td>
+<td headers="2018 stub_1_4 Malaysia" class="gt_row gt_right">186.0</td>
+<td headers="2018 stub_1_4 Myanmar" class="gt_row gt_right">1,063.1</td>
+<td headers="2018 stub_1_4 Philippines" class="gt_row gt_right">1,873.1</td>
+<td headers="2018 stub_1_4 Singapore" class="gt_row gt_right">18.5</td>
+<td headers="2018 stub_1_4 Thailand" class="gt_row gt_right">999.2</td>
+<td headers="2018 stub_1_4 Viet Nam" class="gt_row gt_right">3,816.4</td>
+<td headers="2018 stub_1_4 ASEAN" class="gt_row gt_right">8,440.4</td></tr>
+    <tr><th id="stub_1_5" scope="row" class="gt_row gt_left gt_stub">Poultry meat</th>
+<td headers="2018 stub_1_5 Brunei Darussalam" class="gt_row gt_right">25.3</td>
+<td headers="2018 stub_1_5 Cambodia" class="gt_row gt_right">27.3</td>
+<td headers="2018 stub_1_5 Indonesia" class="gt_row gt_right">2,588.2</td>
+<td headers="2018 stub_1_5 Lao PDR" class="gt_row gt_right">30.8</td>
+<td headers="2018 stub_1_5 Malaysia" class="gt_row gt_right">1,873.0</td>
+<td headers="2018 stub_1_5 Myanmar" class="gt_row gt_right">1,896.4</td>
+<td headers="2018 stub_1_5 Philippines" class="gt_row gt_right">1,379.8</td>
+<td headers="2018 stub_1_5 Singapore" class="gt_row gt_right">106.8</td>
+<td headers="2018 stub_1_5 Thailand" class="gt_row gt_right">1,779.8</td>
+<td headers="2018 stub_1_5 Viet Nam" class="gt_row gt_right">947.0</td>
+<td headers="2018 stub_1_5 ASEAN" class="gt_row gt_right">10,654.4</td></tr>
+    <tr><th id="stub_1_6" scope="row" class="gt_row gt_left gt_stub">Poultry production</th>
+<td headers="2018 stub_1_6 Brunei Darussalam" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_6 Cambodia" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_6 Indonesia" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_6 Lao PDR" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_6 Malaysia" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_6 Myanmar" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_6 Philippines" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_6 Singapore" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_6 Thailand" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_6 Viet Nam" class="gt_row gt_right"><br></td>
+<td headers="2018 stub_1_6 ASEAN" class="gt_row gt_right"><br></td></tr>
+    <tr><th id="stub_1_7" scope="row" class="gt_row gt_left gt_stub">Total meat production</th>
+<td headers="2018 stub_1_7 Brunei Darussalam" class="gt_row gt_right">26.1</td>
+<td headers="2018 stub_1_7 Cambodia" class="gt_row gt_right">180.5</td>
+<td headers="2018 stub_1_7 Indonesia" class="gt_row gt_right">3,594.1</td>
+<td headers="2018 stub_1_7 Lao PDR" class="gt_row gt_right">156.5</td>
+<td headers="2018 stub_1_7 Malaysia" class="gt_row gt_right">2,113.5</td>
+<td headers="2018 stub_1_7 Myanmar" class="gt_row gt_right">3,528.8</td>
+<td headers="2018 stub_1_7 Philippines" class="gt_row gt_right">3,624.3</td>
+<td headers="2018 stub_1_7 Singapore" class="gt_row gt_right">125.3</td>
+<td headers="2018 stub_1_7 Thailand" class="gt_row gt_right">2,932.9</td>
+<td headers="2018 stub_1_7 Viet Nam" class="gt_row gt_right">5,199.0</td>
+<td headers="2018 stub_1_7 ASEAN" class="gt_row gt_right">21,481.0</td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="12" class="gt_group_heading" scope="colgroup" id="2019">2019</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_8" scope="row" class="gt_row gt_left gt_stub">Beef and Buffalo Meat</th>
+<td headers="2019 stub_1_8 Brunei Darussalam" class="gt_row gt_right">1.6</td>
+<td headers="2019 stub_1_8 Cambodia" class="gt_row gt_right">61.8</td>
+<td headers="2019 stub_1_8 Indonesia" class="gt_row gt_right">529.6</td>
+<td headers="2019 stub_1_8 Lao PDR" class="gt_row gt_right">57.2</td>
+<td headers="2019 stub_1_8 Malaysia" class="gt_row gt_right">44.0</td>
+<td headers="2019 stub_1_8 Myanmar" class="gt_row gt_right">483.2</td>
+<td headers="2019 stub_1_8 Philippines" class="gt_row gt_right">200.6</td>
+<td headers="2019 stub_1_8 Singapore" class="gt_row gt_right">0.0</td>
+<td headers="2019 stub_1_8 Thailand" class="gt_row gt_right">162.9</td>
+<td headers="2019 stub_1_8 Viet Nam" class="gt_row gt_right">449.8</td>
+<td headers="2019 stub_1_8 ASEAN" class="gt_row gt_right">1,990.7</td></tr>
+    <tr><th id="stub_1_9" scope="row" class="gt_row gt_left gt_stub">Livestock production</th>
+<td headers="2019 stub_1_9 Brunei Darussalam" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_9 Cambodia" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_9 Indonesia" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_9 Lao PDR" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_9 Malaysia" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_9 Myanmar" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_9 Philippines" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_9 Singapore" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_9 Thailand" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_9 Viet Nam" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_9 ASEAN" class="gt_row gt_right"><br></td></tr>
+    <tr><th id="stub_1_10" scope="row" class="gt_row gt_left gt_stub">Mutton and Goat Meat</th>
+<td headers="2019 stub_1_10 Brunei Darussalam" class="gt_row gt_right">0.0</td>
+<td headers="2019 stub_1_10 Cambodia" class="gt_row gt_right">-</td>
+<td headers="2019 stub_1_10 Indonesia" class="gt_row gt_right">142.9</td>
+<td headers="2019 stub_1_10 Lao PDR" class="gt_row gt_right">2.6</td>
+<td headers="2019 stub_1_10 Malaysia" class="gt_row gt_right">4.2</td>
+<td headers="2019 stub_1_10 Myanmar" class="gt_row gt_right">135.3</td>
+<td headers="2019 stub_1_10 Philippines" class="gt_row gt_right">33.7</td>
+<td headers="2019 stub_1_10 Singapore" class="gt_row gt_right">0.0</td>
+<td headers="2019 stub_1_10 Thailand" class="gt_row gt_right">2.0</td>
+<td headers="2019 stub_1_10 Viet Nam" class="gt_row gt_right">21.0</td>
+<td headers="2019 stub_1_10 ASEAN" class="gt_row gt_right">341.8</td></tr>
+    <tr><th id="stub_1_11" scope="row" class="gt_row gt_left gt_stub">Pig meat</th>
+<td headers="2019 stub_1_11 Brunei Darussalam" class="gt_row gt_right">0.0</td>
+<td headers="2019 stub_1_11 Cambodia" class="gt_row gt_right">93.0</td>
+<td headers="2019 stub_1_11 Indonesia" class="gt_row gt_right">236.3</td>
+<td headers="2019 stub_1_11 Lao PDR" class="gt_row gt_right">93.1</td>
+<td headers="2019 stub_1_11 Malaysia" class="gt_row gt_right">222.8</td>
+<td headers="2019 stub_1_11 Myanmar" class="gt_row gt_right">1,092.7</td>
+<td headers="2019 stub_1_11 Philippines" class="gt_row gt_right">1,607.7</td>
+<td headers="2019 stub_1_11 Singapore" class="gt_row gt_right">22.9</td>
+<td headers="2019 stub_1_11 Thailand" class="gt_row gt_right">895.4</td>
+<td headers="2019 stub_1_11 Viet Nam" class="gt_row gt_right">3,328.8</td>
+<td headers="2019 stub_1_11 ASEAN" class="gt_row gt_right">7,592.6</td></tr>
+    <tr><th id="stub_1_12" scope="row" class="gt_row gt_left gt_stub">Poultry meat</th>
+<td headers="2019 stub_1_12 Brunei Darussalam" class="gt_row gt_right">24.8</td>
+<td headers="2019 stub_1_12 Cambodia" class="gt_row gt_right">27.9</td>
+<td headers="2019 stub_1_12 Indonesia" class="gt_row gt_right">3,975.5</td>
+<td headers="2019 stub_1_12 Lao PDR" class="gt_row gt_right">38.2</td>
+<td headers="2019 stub_1_12 Malaysia" class="gt_row gt_right">1,655.3</td>
+<td headers="2019 stub_1_12 Myanmar" class="gt_row gt_right">1,644.0</td>
+<td headers="2019 stub_1_12 Philippines" class="gt_row gt_right">1,508.9</td>
+<td headers="2019 stub_1_12 Singapore" class="gt_row gt_right">99.8</td>
+<td headers="2019 stub_1_12 Thailand" class="gt_row gt_right">1,804.4</td>
+<td headers="2019 stub_1_12 Viet Nam" class="gt_row gt_right">1,144.6</td>
+<td headers="2019 stub_1_12 ASEAN" class="gt_row gt_right">11,923.4</td></tr>
+    <tr><th id="stub_1_13" scope="row" class="gt_row gt_left gt_stub">Poultry production</th>
+<td headers="2019 stub_1_13 Brunei Darussalam" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_13 Cambodia" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_13 Indonesia" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_13 Lao PDR" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_13 Malaysia" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_13 Myanmar" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_13 Philippines" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_13 Singapore" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_13 Thailand" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_13 Viet Nam" class="gt_row gt_right"><br></td>
+<td headers="2019 stub_1_13 ASEAN" class="gt_row gt_right"><br></td></tr>
+    <tr><th id="stub_1_14" scope="row" class="gt_row gt_left gt_stub">Total meat production</th>
+<td headers="2019 stub_1_14 Brunei Darussalam" class="gt_row gt_right">26.5</td>
+<td headers="2019 stub_1_14 Cambodia" class="gt_row gt_right">182.6</td>
+<td headers="2019 stub_1_14 Indonesia" class="gt_row gt_right">4,884.3</td>
+<td headers="2019 stub_1_14 Lao PDR" class="gt_row gt_right">191.1</td>
+<td headers="2019 stub_1_14 Malaysia" class="gt_row gt_right">1,926.3</td>
+<td headers="2019 stub_1_14 Myanmar" class="gt_row gt_right">3,355.3</td>
+<td headers="2019 stub_1_14 Philippines" class="gt_row gt_right">3,350.9</td>
+<td headers="2019 stub_1_14 Singapore" class="gt_row gt_right">122.7</td>
+<td headers="2019 stub_1_14 Thailand" class="gt_row gt_right">2,864.7</td>
+<td headers="2019 stub_1_14 Viet Nam" class="gt_row gt_right">4,944.1</td>
+<td headers="2019 stub_1_14 ASEAN" class="gt_row gt_right">21,848.5</td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="12" class="gt_group_heading" scope="colgroup" id="2020">2020</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_15" scope="row" class="gt_row gt_left gt_stub">Beef and Buffalo Meat</th>
+<td headers="2020 stub_1_15 Brunei Darussalam" class="gt_row gt_right">2.4</td>
+<td headers="2020 stub_1_15 Cambodia" class="gt_row gt_right">61.2</td>
+<td headers="2020 stub_1_15 Indonesia" class="gt_row gt_right">540.5</td>
+<td headers="2020 stub_1_15 Lao PDR" class="gt_row gt_right">59.0</td>
+<td headers="2020 stub_1_15 Malaysia" class="gt_row gt_right">43.5</td>
+<td headers="2020 stub_1_15 Myanmar" class="gt_row gt_right">511.7</td>
+<td headers="2020 stub_1_15 Philippines" class="gt_row gt_right">174.8</td>
+<td headers="2020 stub_1_15 Singapore" class="gt_row gt_right">0.0</td>
+<td headers="2020 stub_1_15 Thailand" class="gt_row gt_right">132.0</td>
+<td headers="2020 stub_1_15 Viet Nam" class="gt_row gt_right">470.3</td>
+<td headers="2020 stub_1_15 ASEAN" class="gt_row gt_right">1,995.5</td></tr>
+    <tr><th id="stub_1_16" scope="row" class="gt_row gt_left gt_stub">Livestock production</th>
+<td headers="2020 stub_1_16 Brunei Darussalam" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_16 Cambodia" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_16 Indonesia" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_16 Lao PDR" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_16 Malaysia" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_16 Myanmar" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_16 Philippines" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_16 Singapore" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_16 Thailand" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_16 Viet Nam" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_16 ASEAN" class="gt_row gt_right"><br></td></tr>
+    <tr><th id="stub_1_17" scope="row" class="gt_row gt_left gt_stub">Mutton and Goat Meat</th>
+<td headers="2020 stub_1_17 Brunei Darussalam" class="gt_row gt_right">0.1</td>
+<td headers="2020 stub_1_17 Cambodia" class="gt_row gt_right">-</td>
+<td headers="2020 stub_1_17 Indonesia" class="gt_row gt_right">136.7</td>
+<td headers="2020 stub_1_17 Lao PDR" class="gt_row gt_right">2.7</td>
+<td headers="2020 stub_1_17 Malaysia" class="gt_row gt_right">4.0</td>
+<td headers="2020 stub_1_17 Myanmar" class="gt_row gt_right">126.7</td>
+<td headers="2020 stub_1_17 Philippines" class="gt_row gt_right">31.7</td>
+<td headers="2020 stub_1_17 Singapore" class="gt_row gt_right">0.0</td>
+<td headers="2020 stub_1_17 Thailand" class="gt_row gt_right">2.0</td>
+<td headers="2020 stub_1_17 Viet Nam" class="gt_row gt_right">21.3</td>
+<td headers="2020 stub_1_17 ASEAN" class="gt_row gt_right">325.3</td></tr>
+    <tr><th id="stub_1_18" scope="row" class="gt_row gt_left gt_stub">Pig meat</th>
+<td headers="2020 stub_1_18 Brunei Darussalam" class="gt_row gt_right">0.0</td>
+<td headers="2020 stub_1_18 Cambodia" class="gt_row gt_right">93.2</td>
+<td headers="2020 stub_1_18 Indonesia" class="gt_row gt_right">241.4</td>
+<td headers="2020 stub_1_18 Lao PDR" class="gt_row gt_right">97.6</td>
+<td headers="2020 stub_1_18 Malaysia" class="gt_row gt_right">221.3</td>
+<td headers="2020 stub_1_18 Myanmar" class="gt_row gt_right">1,127.1</td>
+<td headers="2020 stub_1_18 Philippines" class="gt_row gt_right">1,499.9</td>
+<td headers="2020 stub_1_18 Singapore" class="gt_row gt_right">27.8</td>
+<td headers="2020 stub_1_18 Thailand" class="gt_row gt_right">893.5</td>
+<td headers="2020 stub_1_18 Viet Nam" class="gt_row gt_right">3,550.1</td>
+<td headers="2020 stub_1_18 ASEAN" class="gt_row gt_right">7,751.8</td></tr>
+    <tr><th id="stub_1_19" scope="row" class="gt_row gt_left gt_stub">Poultry meat</th>
+<td headers="2020 stub_1_19 Brunei Darussalam" class="gt_row gt_right">26.6</td>
+<td headers="2020 stub_1_19 Cambodia" class="gt_row gt_right">27.2</td>
+<td headers="2020 stub_1_19 Indonesia" class="gt_row gt_right">3,752.2</td>
+<td headers="2020 stub_1_19 Lao PDR" class="gt_row gt_right">40.6</td>
+<td headers="2020 stub_1_19 Malaysia" class="gt_row gt_right">1,597.5</td>
+<td headers="2020 stub_1_19 Myanmar" class="gt_row gt_right">1,699.8</td>
+<td headers="2020 stub_1_19 Philippines" class="gt_row gt_right">1,418.0</td>
+<td headers="2020 stub_1_19 Singapore" class="gt_row gt_right">99.8</td>
+<td headers="2020 stub_1_19 Thailand" class="gt_row gt_right">1,843.8</td>
+<td headers="2020 stub_1_19 Viet Nam" class="gt_row gt_right">1,319.2</td>
+<td headers="2020 stub_1_19 ASEAN" class="gt_row gt_right">11,824.6</td></tr>
+    <tr><th id="stub_1_20" scope="row" class="gt_row gt_left gt_stub">Poultry production</th>
+<td headers="2020 stub_1_20 Brunei Darussalam" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_20 Cambodia" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_20 Indonesia" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_20 Lao PDR" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_20 Malaysia" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_20 Myanmar" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_20 Philippines" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_20 Singapore" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_20 Thailand" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_20 Viet Nam" class="gt_row gt_right"><br></td>
+<td headers="2020 stub_1_20 ASEAN" class="gt_row gt_right"><br></td></tr>
+    <tr><th id="stub_1_21" scope="row" class="gt_row gt_left gt_stub">Total meat production</th>
+<td headers="2020 stub_1_21 Brunei Darussalam" class="gt_row gt_right">29.1</td>
+<td headers="2020 stub_1_21 Cambodia" class="gt_row gt_right">181.6</td>
+<td headers="2020 stub_1_21 Indonesia" class="gt_row gt_right">4,670.8</td>
+<td headers="2020 stub_1_21 Lao PDR" class="gt_row gt_right">199.9</td>
+<td headers="2020 stub_1_21 Malaysia" class="gt_row gt_right">1,866.4</td>
+<td headers="2020 stub_1_21 Myanmar" class="gt_row gt_right">3,465.4</td>
+<td headers="2020 stub_1_21 Philippines" class="gt_row gt_right">3,124.3</td>
+<td headers="2020 stub_1_21 Singapore" class="gt_row gt_right">127.6</td>
+<td headers="2020 stub_1_21 Thailand" class="gt_row gt_right">2,871.3</td>
+<td headers="2020 stub_1_21 Viet Nam" class="gt_row gt_right">5,361.0</td>
+<td headers="2020 stub_1_21 ASEAN" class="gt_row gt_right">21,897.4</td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="12" class="gt_group_heading" scope="colgroup" id="2021">2021</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_22" scope="row" class="gt_row gt_left gt_stub">Beef and Buffalo Meat</th>
+<td headers="2021 stub_1_22 Brunei Darussalam" class="gt_row gt_right">4.3</td>
+<td headers="2021 stub_1_22 Cambodia" class="gt_row gt_right">59.5</td>
+<td headers="2021 stub_1_22 Indonesia" class="gt_row gt_right">458.8</td>
+<td headers="2021 stub_1_22 Lao PDR" class="gt_row gt_right">61.3</td>
+<td headers="2021 stub_1_22 Malaysia" class="gt_row gt_right">40.8</td>
+<td headers="2021 stub_1_22 Myanmar" class="gt_row gt_right">136.9</td>
+<td headers="2021 stub_1_22 Philippines" class="gt_row gt_right">182.7</td>
+<td headers="2021 stub_1_22 Singapore" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_22 Thailand" class="gt_row gt_right">154.6</td>
+<td headers="2021 stub_1_22 Viet Nam" class="gt_row gt_right">347.5</td>
+<td headers="2021 stub_1_22 ASEAN" class="gt_row gt_right">1,446.4</td></tr>
+    <tr><th id="stub_1_23" scope="row" class="gt_row gt_left gt_stub">Livestock production</th>
+<td headers="2021 stub_1_23 Brunei Darussalam" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_23 Cambodia" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_23 Indonesia" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_23 Lao PDR" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_23 Malaysia" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_23 Myanmar" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_23 Philippines" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_23 Singapore" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_23 Thailand" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_23 Viet Nam" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_23 ASEAN" class="gt_row gt_right"><br></td></tr>
+    <tr><th id="stub_1_24" scope="row" class="gt_row gt_left gt_stub">Mutton and Goat Meat</th>
+<td headers="2021 stub_1_24 Brunei Darussalam" class="gt_row gt_right">0.1</td>
+<td headers="2021 stub_1_24 Cambodia" class="gt_row gt_right">-</td>
+<td headers="2021 stub_1_24 Indonesia" class="gt_row gt_right">117.6</td>
+<td headers="2021 stub_1_24 Lao PDR" class="gt_row gt_right">2.8</td>
+<td headers="2021 stub_1_24 Malaysia" class="gt_row gt_right">3.6</td>
+<td headers="2021 stub_1_24 Myanmar" class="gt_row gt_right">12.0</td>
+<td headers="2021 stub_1_24 Philippines" class="gt_row gt_right">32.3</td>
+<td headers="2021 stub_1_24 Singapore" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_24 Thailand" class="gt_row gt_right">2.1</td>
+<td headers="2021 stub_1_24 Viet Nam" class="gt_row gt_right">21.3</td>
+<td headers="2021 stub_1_24 ASEAN" class="gt_row gt_right">191.9</td></tr>
+    <tr><th id="stub_1_25" scope="row" class="gt_row gt_left gt_stub">Pig meat</th>
+<td headers="2021 stub_1_25 Brunei Darussalam" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_25 Cambodia" class="gt_row gt_right">107.4</td>
+<td headers="2021 stub_1_25 Indonesia" class="gt_row gt_right">323.7</td>
+<td headers="2021 stub_1_25 Lao PDR" class="gt_row gt_right">101.6</td>
+<td headers="2021 stub_1_25 Malaysia" class="gt_row gt_right">219.2</td>
+<td headers="2021 stub_1_25 Myanmar" class="gt_row gt_right">285.0</td>
+<td headers="2021 stub_1_25 Philippines" class="gt_row gt_right">1,187.3</td>
+<td headers="2021 stub_1_25 Singapore" class="gt_row gt_right">31.3</td>
+<td headers="2021 stub_1_25 Thailand" class="gt_row gt_right">927.7</td>
+<td headers="2021 stub_1_25 Viet Nam" class="gt_row gt_right">2,590.0</td>
+<td headers="2021 stub_1_25 ASEAN" class="gt_row gt_right">5,773.1</td></tr>
+    <tr><th id="stub_1_26" scope="row" class="gt_row gt_left gt_stub">Poultry meat</th>
+<td headers="2021 stub_1_26 Brunei Darussalam" class="gt_row gt_right">31.6</td>
+<td headers="2021 stub_1_26 Cambodia" class="gt_row gt_right">27.8</td>
+<td headers="2021 stub_1_26 Indonesia" class="gt_row gt_right">3,888.5</td>
+<td headers="2021 stub_1_26 Lao PDR" class="gt_row gt_right">43.2</td>
+<td headers="2021 stub_1_26 Malaysia" class="gt_row gt_right">1,625.5</td>
+<td headers="2021 stub_1_26 Myanmar" class="gt_row gt_right">682.5</td>
+<td headers="2021 stub_1_26 Philippines" class="gt_row gt_right">1,367.6</td>
+<td headers="2021 stub_1_26 Singapore" class="gt_row gt_right">84.8</td>
+<td headers="2021 stub_1_26 Thailand" class="gt_row gt_right">1,844.9</td>
+<td headers="2021 stub_1_26 Viet Nam" class="gt_row gt_right">1,702.9</td>
+<td headers="2021 stub_1_26 ASEAN" class="gt_row gt_right">11,299.3</td></tr>
+    <tr><th id="stub_1_27" scope="row" class="gt_row gt_left gt_stub">Poultry production</th>
+<td headers="2021 stub_1_27 Brunei Darussalam" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_27 Cambodia" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_27 Indonesia" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_27 Lao PDR" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_27 Malaysia" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_27 Myanmar" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_27 Philippines" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_27 Singapore" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_27 Thailand" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_27 Viet Nam" class="gt_row gt_right"><br></td>
+<td headers="2021 stub_1_27 ASEAN" class="gt_row gt_right"><br></td></tr>
+    <tr><th id="stub_1_28" scope="row" class="gt_row gt_left gt_stub">Total meat production</th>
+<td headers="2021 stub_1_28 Brunei Darussalam" class="gt_row gt_right">36.0</td>
+<td headers="2021 stub_1_28 Cambodia" class="gt_row gt_right">194.6</td>
+<td headers="2021 stub_1_28 Indonesia" class="gt_row gt_right">4,788.6</td>
+<td headers="2021 stub_1_28 Lao PDR" class="gt_row gt_right">208.9</td>
+<td headers="2021 stub_1_28 Malaysia" class="gt_row gt_right">1,889.1</td>
+<td headers="2021 stub_1_28 Myanmar" class="gt_row gt_right">1,116.4</td>
+<td headers="2021 stub_1_28 Philippines" class="gt_row gt_right">2,769.9</td>
+<td headers="2021 stub_1_28 Singapore" class="gt_row gt_right">116.1</td>
+<td headers="2021 stub_1_28 Thailand" class="gt_row gt_right">2,929.3</td>
+<td headers="2021 stub_1_28 Viet Nam" class="gt_row gt_right">4,661.8</td>
+<td headers="2021 stub_1_28 ASEAN" class="gt_row gt_right">18,710.7</td></tr>
+  </tbody>
+  <tfoot class="gt_sourcenotes">
+    <tr>
+      <td class="gt_sourcenote" colspan="12"><em>Source: FAOSTAT database</em></td>
+    </tr>
+  </tfoot>
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="12"> <em>Note: ‘-’ not available at the time of publication</em></td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply styling to your R script</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">style_file</span>(<span class="st">"Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Styling  1  files:
  Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd ✔ 
@@ -780,19 +2859,37 @@ Status  Count   Legend
 ✖   0   Styling threw an error.
 ──────────────────────────────────────────────────────────────────────</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lint your script to find potential issues</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">lint</span>(<span class="st">"Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lint your script to find potential issues</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">lint</span>(<span class="st">"Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>C:\Users\mirza\OneDrive\Desktop\SIT\Year 2\Trimester 3\Info Visualization\Week 2\CSC3107-Information-Visualization-Lab02\Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd:63:81: style: [line_length_linter] Lines should not be more than 80 characters. This line is 87 characters.
-        c(`Beef and Buffalo Meat`, `Pig Meat`, `Mutton and Goat Meat`, `Poultry Meat`),
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
-C:\Users\mirza\OneDrive\Desktop\SIT\Year 2\Trimester 3\Info Visualization\Week 2\CSC3107-Information-Visualization-Lab02\Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd:80:81: style: [line_length_linter] Lines should not be more than 80 characters. This line is 85 characters.
-    title = "Table 10.14. Livestock and Poultry Meat Production in ASEAN, 2018-2021",
+<pre><code>C:\Users\mirza\OneDrive\Desktop\SIT\Year 2\Trimester 3\Info Visualization\Week 2\CSC3107-Information-Visualization-Lab02\Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd:73:12: warning: [object_usage_linter] no visible binding for global variable 'meat'
+    filter(meat %in% c("Beef and Buffalo Meat", "Goat Meat", "Sheep Meat")) %&gt;%
+           ^~~~
+C:\Users\mirza\OneDrive\Desktop\SIT\Year 2\Trimester 3\Info Visualization\Week 2\CSC3107-Information-Visualization-Lab02\Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd:73:12: warning: [object_usage_linter] no visible binding for global variable 'meat'
+    filter(meat %in% c("Beef and Buffalo Meat", "Goat Meat", "Sheep Meat")) %&gt;%
+           ^~~~
+C:\Users\mirza\OneDrive\Desktop\SIT\Year 2\Trimester 3\Info Visualization\Week 2\CSC3107-Information-Visualization-Lab02\Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd:74:14: warning: [object_usage_linter] no visible binding for global variable 'year'
+    group_by(year) %&gt;%
+             ^~~~
+C:\Users\mirza\OneDrive\Desktop\SIT\Year 2\Trimester 3\Info Visualization\Week 2\CSC3107-Information-Visualization-Lab02\Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd:79:12: warning: [object_usage_linter] no visible binding for global variable 'meat'
+    filter(meat == "Poultry meat") %&gt;%
+           ^~~~
+C:\Users\mirza\OneDrive\Desktop\SIT\Year 2\Trimester 3\Info Visualization\Week 2\CSC3107-Information-Visualization-Lab02\Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd:79:12: warning: [object_usage_linter] no visible binding for global variable 'meat'
+    filter(meat == "Poultry meat") %&gt;%
+           ^~~~
+C:\Users\mirza\OneDrive\Desktop\SIT\Year 2\Trimester 3\Info Visualization\Week 2\CSC3107-Information-Visualization-Lab02\Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd:80:14: warning: [object_usage_linter] no visible binding for global variable 'year'
+    group_by(year) %&gt;%
+             ^~~~
+C:\Users\mirza\OneDrive\Desktop\SIT\Year 2\Trimester 3\Info Visualization\Week 2\CSC3107-Information-Visualization-Lab02\Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd:85:13: warning: [object_usage_linter] no visible binding for global variable 'year'
+    arrange(year, meat)
+            ^~~~
+C:\Users\mirza\OneDrive\Desktop\SIT\Year 2\Trimester 3\Info Visualization\Week 2\CSC3107-Information-Visualization-Lab02\Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd:85:19: warning: [object_usage_linter] no visible binding for global variable 'meat'
+    arrange(year, meat)
+                  ^~~~
+C:\Users\mirza\OneDrive\Desktop\SIT\Year 2\Trimester 3\Info Visualization\Week 2\CSC3107-Information-Visualization-Lab02\Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd:115:81: style: [line_length_linter] Lines should not be more than 80 characters. This line is 85 characters.
+    subtitle = md("*&lt;p style=\"text-align: right;\"&gt;_(in thousand metric ton)_*&lt;/p&gt;")
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
-C:\Users\mirza\OneDrive\Desktop\SIT\Year 2\Trimester 3\Info Visualization\Week 2\CSC3107-Information-Visualization-Lab02\Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd:99:81: style: [line_length_linter] Lines should not be more than 80 characters. This line is 116 characters.
-    columns = c(`Beef and Buffalo Meat`, `Pig Meat`, `Mutton and Goat Meat`, `Poultry Meat`, Total_meat_production),
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-C:\Users\mirza\OneDrive\Desktop\SIT\Year 2\Trimester 3\Info Visualization\Week 2\CSC3107-Information-Visualization-Lab02\Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd:113:81: style: [line_length_linter] Lines should not be more than 80 characters. This line is 84 characters.
+C:\Users\mirza\OneDrive\Desktop\SIT\Year 2\Trimester 3\Info Visualization\Week 2\CSC3107-Information-Visualization-Lab02\Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd:151:81: style: [line_length_linter] Lines should not be more than 80 characters. This line is 84 characters.
 style_file("Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd")
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~</code></pre>
 </div>

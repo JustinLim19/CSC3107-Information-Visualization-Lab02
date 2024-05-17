@@ -72,15 +72,15 @@ add_production_rows <- function(df) {
   livestock_row <- df %>%
     filter(meat %in% c("Beef and Buffalo Meat", "Goat Meat", "Sheep Meat")) %>%
     group_by(year) %>%
-    summarize(meat = "Livestock production", across(-c(meat), ~ NA_real_)) %>%
+    summarize(meat = "Livestock production", across(-c(meat), ~NA_real_)) %>%
     ungroup()
-  
+
   poultry_row <- df %>%
     filter(meat == "Poultry meat") %>%
     group_by(year) %>%
-    summarize(meat = "Poultry production", across(-c(meat), ~ NA_real_)) %>%
+    summarize(meat = "Poultry production", across(-c(meat), ~NA_real_)) %>%
     ungroup()
-  
+
   bind_rows(df, livestock_row, poultry_row) %>%
     arrange(year, meat)
 }
@@ -108,14 +108,14 @@ with_totals %>%
   tab_options(
     table.font.size = px(9),
     heading.title.font.size = px(14),
-    heading.title.font.weight = "bold",
+    heading.title.font.weight = "bold"
   ) %>%
   tab_header(
     title = md("**Livestock and Poultry Meat Production in ASEAN, 2018–2021**"),
-    subtitle = md("*<p style=\"text-align: right;\">_(in thousand metric ton)_*</p>"),
+    subtitle = md("*<p style=\"text-align: right;\">_(in thousand metric ton)_*</p>")
   ) %>%
   tab_stubhead(
-    label = md("**Animal Type**"),
+    label = md("**Animal Type**")
   ) %>%
   tab_spanner(
     label = md("**Year**"),
@@ -126,17 +126,17 @@ with_totals %>%
   ) %>%
   tab_source_note(
     source_note = md("*Source: FAOSTAT database*")
-  ) %>% 
+  ) %>%
   fmt_number(
     decimals = 1
-  ) %>% 
+  ) %>%
   fmt_missing(
     missing_text = "-"
   ) %>%
   fmt_missing(
     rows = matches("Livestock production"),
     missing_text = ""
-  ) %>% 
+  ) %>%
   fmt_missing(
     rows = matches("Poultry production"),
     missing_text = ""
