@@ -1,6 +1,6 @@
 ---
 title: "Team Lab Assignment 2: Presenting ASEAN Meat Production as a Table"
-author: "Abdul Halim Bin Abdul Rahim, Ryan Ong, Mirza Anaqi, Gabriel Lau, Elroy Lian, Frederick Ang"
+author: "ABDUL HALIM BIN ABDUL RAHIM(2201627), MIRZA ANAQI BIN MUHAMMAD HAIZAN(2200981), ANG GUO ZHENG FREDERICK(2203322), MARK PENG JUNG ZEN(2200849), FONG KAH KIAN(2200727), AMANDA CHAN HUI EN(2203417)"
 date: "2024-05-17"
 format: html
 ---
