@@ -109,15 +109,13 @@ with_totals %>%
     table.font.size = px(9),
     heading.title.font.size = px(14),
     heading.title.font.weight = "bold",
-    heading.title.position = "top",
-    heading.subtitle.justification = "right",
   ) %>%
   tab_header(
     title = md("**Livestock and Poultry Meat Production in ASEAN, 2018–2021**"),
-    subtitle = md("*_(in thousand metric ton)_*"),
+    subtitle = md("*<p style=\"text-align: right;\">_(in thousand metric ton)_*</p>"),
   ) %>%
   tab_stubhead(
-    label = md("**Animal Type**")
+    label = md("**Animal Type**"),
   ) %>%
   tab_spanner(
     label = md("**Year**"),
