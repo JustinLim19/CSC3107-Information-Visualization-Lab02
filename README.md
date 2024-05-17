@@ -40,6 +40,7 @@ Lab Tasks
 - Formats summary row (one decimal place and comma as thousands separator) - Completed
 
 3. Styling the Table
+
 3.1. Title and subtitle styling
 - Applies specified text styling (size and weight) to title - Completed
 - Applies specified text alignment to subtitle - Completed
@@ -69,6 +70,7 @@ Lab Tasks
 - Sets specified padding for row groups, data rows, and summary rows - Completed
 
 4. Coding Style & Rendering
+
 4.1. Coding practices
 - No use of for loops or spaghetti code (excessive repetitions, more than 50 lines per task) - Completed
 
