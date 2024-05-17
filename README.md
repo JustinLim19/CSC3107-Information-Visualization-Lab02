@@ -2,7 +2,9 @@
 Team Lab Assignment 2: Presenting ASEAN Meat Production as a Table
 
 Lab Tasks
+
 2. Reconstructing the Content of the Table
+
 2.1. Data frame pivoting
 - Pivoted correctly - Completed
 
