@@ -1,6 +1,6 @@
 ---
 title: "Team Lab Assignment 2: Presenting ASEAN Meat Production as a Table"
-author: "ABDUL HALIM BIN ABDUL RAHIM(2201627), MIRZA ANAQI BIN MUHAMMAD HAIZAN(2200981), ANG GUO ZHENG FREDERICK(2203322), MARK PENG JUNG ZEN(2200849), FONG KAH KIAN(2200727), AMANDA CHAN HUI EN(2203417)"
+author: "Abdul Halim Bin Abdul Rahim, Ryan Ong, Mirza Anaqi, Gabriel Lau, Elroy Lian, Frederick Ang"
 date: "2024-05-17"
 format: html
 ---
@@ -27,7 +27,7 @@ library(styler)
 library(lintr)
 ```
 
-You can add options to executable code like this 
+You can add options to executable code like this
 
 ```{r}
 # Load raw data
@@ -40,72 +40,112 @@ head(raw_data)
 unique(raw_data$meat)
 ```
 
+## 2.1 **Pivot the Data**
+
 ```{r}
-# Standardize meat type names if necessary
+# Pivot the data to have one column per country
 raw_data <- raw_data %>%
-  mutate(meat = case_when(
-    meat == "Beef and Buffalo Meat" ~ "Beef and Buffalo Meat",
-    meat == "Pig meat" ~ "Pig Meat", # Standardizing to "Pig Meat"
-    meat == "Mutton and Goat Meat" ~ "Mutton and Goat Meat",
-    meat == "Poultry meat" ~ "Poultry Meat", # Standardizing to "Poultry Meat"
-    TRUE ~ meat # Keep other values unchanged
-  ))
+  pivot_wider(names_from = country, values_from = kt)
+
+# Preview the data
+gt_preview(raw_data)
 ```
 
+## 2.2 **Append ASEAN Column**
+
 ```{r}
-# Data cleaning and manipulation
-data_wide <- raw_data %>%
-  pivot_wider(names_from = meat, values_from = kt) %>%
-  group_by(country, year) %>%
-  mutate(
-    Total_meat_production = rowSums(
-      across(
-        c(`Beef and Buffalo Meat`, `Pig Meat`, `Mutton and Goat Meat`, `Poultry Meat`),
-        ~ replace_na(.x, 0)
-      )
-    )
-  ) %>%
+# Calculate the total meat production for each animal type and year
+raw_data <- raw_data %>%
+  rowwise() %>%
+  mutate(ASEAN = sum(c_across(-c(year, meat)), na.rm = TRUE)) %>%
   ungroup()
+
+# Preview the data using gt
+gt_preview(raw_data)
 ```
 
+## **2.3 Insert Livestock and Poultry Production Rows**
+
 ```{r}
-# Filter the data for the year 2021
-data_2021 <- data_wide %>%
-  filter(year == 2021)
+# Define a function to add "Livestock production" and "Poultry production" rows
+add_production_rows <- function(df) {
+  livestock_row <- df %>%
+    filter(meat %in% c("Beef and Buffalo Meat", "Goat Meat", "Sheep Meat")) %>%
+    group_by(year) %>%
+    summarize(meat = "Livestock production", across(-c(meat), ~ NA_real_)) %>%
+    ungroup()
+  
+  poultry_row <- df %>%
+    filter(meat == "Poultry meat") %>%
+    group_by(year) %>%
+    summarize(meat = "Poultry production", across(-c(meat), ~ NA_real_)) %>%
+    ungroup()
+  
+  bind_rows(df, livestock_row, poultry_row) %>%
+    arrange(year, meat)
+}
 
-# Create the table
-table_gt <- data_2021 %>%
-  gt() %>%
+# Add the "Livestock production" and "Poultry production" rows
+raw_data <- add_production_rows(raw_data)
+
+totals <- raw_data %>%
+  group_by(year) %>%
+  summarize(across(where(is.numeric), sum, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(meat = "Total meat production")
+
+with_totals <- bind_rows(raw_data, totals) %>%
+  arrange(year, meat)
+
+gt_preview(with_totals)
+```
+
+## **gt table**
+
+```{r}
+with_totals %>%
+  gt(rowname_col = "meat", groupname_col = "year") %>%
+  tab_options(
+    table.font.size = px(9),
+    heading.title.font.size = px(14),
+    heading.title.font.weight = "bold",
+    heading.title.position = "top",
+    heading.subtitle.justification = "right",
+  ) %>%
   tab_header(
-    title = "Table 10.14. Livestock and Poultry Meat Production in ASEAN, 2018-2021",
-    subtitle = "(in thousand metric tons)"
+    title = md("**Livestock and Poultry Meat Production in ASEAN, 2018–2021**"),
+    subtitle = md("*_(in thousand metric ton)_*"),
+  ) %>%
+  tab_stubhead(
+    label = md("**Animal Type**")
   ) %>%
   tab_spanner(
-    label = "Livestock production",
-    columns = c(`Beef and Buffalo Meat`, `Pig Meat`, `Mutton and Goat Meat`)
-  ) %>%
-  tab_spanner(
-    label = "Poultry production",
-    columns = c(`Poultry Meat`)
-  ) %>%
-  cols_label(
-    `Beef and Buffalo Meat` = "Beef and Buffalo Meat",
-    `Pig Meat` = "Pig Meat",
-    `Mutton and Goat Meat` = "Mutton and Goat Meat",
-    `Poultry Meat` = "Poultry Meat",
-    Total_meat_production = "Total meat production"
-  ) %>%
-  fmt_number(
-    columns = c(`Beef and Buffalo Meat`, `Pig Meat`, `Mutton and Goat Meat`, `Poultry Meat`, Total_meat_production),
-    decimals = 1
-  ) %>%
-  cols_align(
-    align = "center",
+    label = md("**Year**"),
     columns = everything()
+  ) %>%
+  tab_footnote(
+    footnote = md("*Note: ‘-’ not available at the time of publication*")
+  ) %>%
+  tab_source_note(
+    source_note = md("*Source: FAOSTAT database*")
+  ) %>% 
+  fmt_number(
+    decimals = 1
+  ) %>% 
+  fmt_missing(
+    missing_text = "-"
+  ) %>%
+  fmt_missing(
+    rows = matches("Livestock production"),
+    missing_text = ""
+  ) %>% 
+  fmt_missing(
+    rows = matches("Poultry production"),
+    missing_text = ""
+  ) %>%
+  cols_width(
+    stub() ~ px(150)
   )
-
-# Print the table
-table_gt
 ```
 
 ```{r}
@@ -115,4 +155,5 @@ style_file("Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.q
 # Lint your script to find potential issues
 lint("Team Lab Assignment 2- Presenting ASEAN Meat Production as a Table.qmd")
 ```
+
 The `echo: false` option disables the printing of code (only output is displayed).
