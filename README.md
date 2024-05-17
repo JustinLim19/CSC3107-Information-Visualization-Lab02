@@ -2,28 +2,76 @@
 Team Lab Assignment 2: Presenting ASEAN Meat Production as a Table
 
 Lab Tasks
-2    Reconstructing the Content of the Table
-2.1    Data frame is pivoted correctly - Completed
-2.2    Row sums are calculated based on the correct columns - Completed
-       Correctly handles missing values using na.rm = TRUE - Completed
-2.3    Correctly adds rows with the specified meat values Correctly inserts missing values for all countries - Completed
-2.4    Creates a gt table, specifying "meat" as stub (i.e., row-name  column) and "year" as group name Uses 9-pixel font size - Completed
-2.5    Adds title, subtitle, stubhead, footnote, and source note Uses bold italics for emphasis - Completed
-2.6    Formats numbers in the columns from Brunei Darussalam to ASEAN to one decimal place, using a comma as thousands separator - Completed
-2.7    Correctly replaces missing values with the specified text ("") Correctly replaces missing values with the specified text ("-") - Completed
-2.8    Correctly adjusts the stub width - Completed
-2.9    Correctly calculates the summary (sum) from Brunei Darussalam to ASEAN Correctly formats the summary row (one decimal place and comma as thousands separator) - Completed
+2. Reconstructing the Content of the Table
+2.1. Data frame pivoting
+- Pivoted correctly - Completed
 
-3    Styling the Table
-3.1    Applies the specified text styling (size and weight) to the table title Applies the specified text alignment to the table subtitle - Completed
-3.2    Applies the specified styles (fill color, alignment, vertical alignment) to the table Applies the specified styles (text color, font weight, and borders)      to the table Correctly specifies the locations (stubhead and column labels) where the styles should be applied - Completed
-3.3    Applies the specified styles (fill color, text color, font weight) to the table Correctly specifies the location (row groups) where the styles should be       applied - Completed
-3.4    Applies the specified styles (fill color, font weight, and hidden borders) to the table Correctly specifies the locations (body cells and stub cells) where    the styles should be applied ("production" rows) - Completed
-3.5    Applies the specified styles (fill color, text color, font weight, and borders) to the table Correctly specifies the locations (stub summary cells and         summary cells) where the styles should be applied - Completed
-3.6    Applies the specified styles (fill color and borders) to the table Correctly specifies the locations (body cells and stub cells) where the styles should be    applied based on specified conditions - Completed
-3.7    Sets the specified padding for row groups, data rows, and summary rows - Completed
+2.2. Row sums calculation
+- Calculated based on correct columns - Completed
+- Handles missing values using na.rm = TRUE - Completed
 
-4    Coding Style & Rendering
-4.1    No use of for loops & spaghetti codes (excessive code repetitions, more than 50 lines for one task) - Completed
-4.2    Compliant with the tidyverse style - Completed
-4.3    QMD rendered correctly as HTML (yes = 10, no = 0) - Completed
+2.3. Adding rows and handling missing values
+- Adds rows with specified meat values - Completed
+- Inserts missing values for all countries - Completed
+
+2.4. Creating a GT table
+- Specifies "meat" as stub (row-name column) and "year" as group name - Completed
+- Uses 9-pixel font size - Completed
+
+2.5. Table enhancements
+&nbsp- Adds title, subtitle, stubhead, footnote, and source note - Completed
+- Uses bold italics for emphasis - Completed
+
+2.6. Number formatting
+- Formats numbers in columns from Brunei Darussalam to ASEAN to one decimal place - Completed
+- Uses a comma as a thousands separator - Completed
+
+2.7. Handling missing values in cells
+- Replaces missing values with specified text ("") - Completed
+- Replaces missing values with specified text ("-") - Completed
+
+2.8. Stub width adjustment
+- Adjusted correctly - Completed
+
+2.9. Summary calculations and formatting
+- Calculates summary (sum) from Brunei Darussalam to ASEAN - Completed
+- Formats summary row (one decimal place and comma as thousands separator) - Completed
+
+3. Styling the Table
+3.1. Title and subtitle styling
+- Applies specified text styling (size and weight) to title - Completed
+- Applies specified text alignment to subtitle - Completed
+
+3.2. Table cell styling
+- Applies specified styles (fill color, alignment, vertical alignment) - Completed
+- Applies specified styles (text color, font weight, borders) - Completed
+- Specifies locations (stubhead and column labels) for styles - Completed
+
+3.3. Row group styling
+- Applies specified styles (fill color, text color, font weight) - Completed
+- Specifies locations (row groups) for styles - Completed
+
+3.4. Body and stub cell styling
+- Applies specified styles (fill color, font weight, hidden borders) - Completed
+- Specifies locations (body cells and stub cells) for styles ("production" rows) - Completed
+
+3.5. Summary cell styling
+- Applies specified styles (fill color, text color, font weight, borders) - Completed
+- Specifies locations (stub summary cells and summary cells) for styles - Completed
+
+3.6. Conditional cell styling
+- Applies specified styles (fill color, borders) based on conditions - Completed
+- Specifies locations (body cells and stub cells) for styles - Completed
+
+3.7. Padding settings
+- Sets specified padding for row groups, data rows, and summary rows - Completed
+
+4. Coding Style & Rendering
+4.1. Coding practices
+- No use of for loops or spaghetti code (excessive repetitions, more than 50 lines per task) - Completed
+
+4.2. Tidyverse compliance
+- Code is compliant with tidyverse style - Completed
+
+4.3. Rendering
+- QMD rendered correctly as HTML (yes = 10, no = 0) - Completed
